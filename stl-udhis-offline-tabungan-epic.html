@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>STL-UDHIS — Offline Tabungan (Guru) — iOS‑26 Epic Theme</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@300;400;600&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- Export libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    /* ---------------------------
+       iOS‑26 Epic Design System (lightweight)
+       - glassmorphism
+       - dynamic glow driven by --primary
+       - four theme presets + custom color
+       - smooth transitions
+       --------------------------- */
+    :root{
+      /* Base tokens */
+      --bg: linear-gradient(180deg,#f4f7fb 0%, #eef4fc 100%);
+      --page-bg: rgba(245,248,252,1);
+      --card-bg: rgba(255,255,255,0.7);
+      --glass-border: rgba(255,255,255,0.6);
+      --text: #0b1320;
+      --muted: #50607a;
+      --primary: #667eea;
+      --accent: #764ba2;
+      --radius: 18px;
+      --shadow-1: 0 8px 30px rgba(22,28,45,0.08);
+      --glass-blur: 12px;
+      --font-sans: "Inter", "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --glow-strength: 0.14; /* multiplied in shadows */
+    }
+
+    /* Theme presets */
+    :root.theme-ocean{ --primary: #0ea5a4; --accent:#2563eb; --page-bg: linear-gradient(180deg,#e6fbfb 0%, #f0f8ff 100%); }
+    :root.theme-sunrise{ --primary:#ff8a65; --accent:#ff5252; --page-bg: linear-gradient(180deg,#fff7ed 0%, #fff1f0 100%); }
+    :root.theme-aurora{ --primary:#7c3aed; --accent:#06b6d4; --page-bg: linear-gradient(180deg,#f8f6ff 0%, #f0fbff 100%); }
+    :root.theme-midnight{ --primary:#2dd4bf; --accent:#3b82f6; --page-bg: linear-gradient(180deg,#0f1724 0%, #071022 100%); --text:#e6eef8; --card-bg: rgba(8,12,20,0.55); --glass-border: rgba(255,255,255,0.06); --muted:#9fb3d8; }
+
+    /* Page */
+    html,body{height:100%;margin:0;padding:0;background:var(--page-bg);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+    .wrap{max-width:1100px;margin:28px auto;padding:18px;display:block}
+
+    /* Header */
+    .header{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;
+      backdrop-filter: blur(var(--glass-blur));
+      background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.35));
+      border-radius: calc(var(--radius) + 6px);
+      padding:16px;
+      box-shadow: var(--shadow-1);
+      border: 1px solid var(--glass-border);
+    }
+    .title h1{margin:0;font-size:20px;letter-spacing:-0.3px}
+    .title .sub{font-size:13px;color:var(--muted);margin-top:4px}
+
+    /* Buttons */
+    .controls{display:flex;gap:10px;align-items:center}
+    .btn{
+      display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700;
+      background:transparent;color:var(--text);backdrop-filter: blur(6px);transition:all .28s cubic-bezier(.2,.9,.2,1);
+      box-shadow: 0 6px 18px rgba(8,12,24,0.06);
+      border:1px solid rgba(255,255,255,0.35);
+    }
+    .btn:active{transform:translateY(1px) scale(.998)}
+    .btn-primary{
+      background: linear-gradient(135deg,var(--primary), var(--accent));
+      color: white;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 0 40px rgba(0,0,0,var(--glow-strength));
+      border: none;
+    }
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--muted)}
+
+    /* Layout grid */
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    @media(max-width:980px){ .grid{grid-template-columns:1fr} }
+
+    /* Card */
+    .card{
+      background: var(--card-bg);
+      border-radius: calc(var(--radius));
+      padding:16px;
+      box-shadow: var(--shadow-1);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(var(--glass-blur));
+      transition: transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s;
+    }
+    .card:hover{ transform:translateY(-6px); box-shadow: 0 18px 60px rgba(10,14,30,0.12); }
+
+    /* Forms */
+    label.small{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    .enhanced{
+      width:100%;padding:12px;border-radius:12px;border:1px solid rgba(13,18,28,0.06);
+      background:rgba(255,255,255,0.6);outline:none;font-weight:600;transition:all .22s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    .enhanced:focus{ transform:translateY(-2px); box-shadow: 0 6px 30px rgba(12,18,40,0.08); }
+
+    /* Accent styles driven by --primary color */
+    .accent-pill{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:800;background:linear-gradient(90deg,rgba(255,255,255,0.08), rgba(255,255,255,0));border:1px solid rgba(255,255,255,0.06)}
+    .account-pill{display:inline-block;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(0,0,0,0.03), rgba(255,255,255,0.03));font-weight:800}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse;margin-top:12px;background:transparent}
+    th,td{padding:12px 10px;text-align:left;border-bottom:1px solid rgba(15,23,42,0.04);color:var(--text)}
+    thead th{font-weight:700;font-size:13px;color:var(--muted);opacity:0.95}
+
+    /* Fancy totals */
+    .summary{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:12px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.14));
+      border:1px solid rgba(255,255,255,0.06);margin-bottom:8px;
+    }
+    .balance-big{font-weight:900;font-size:20px;letter-spacing:-0.6px}
+
+    /* Theme swatches */
+    .swatches{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .swatch{width:40px;height:36px;border-radius:9px;border:1px solid rgba(255,255,255,0.08);cursor:pointer;box-shadow:0 6px 20px rgba(12,18,40,0.06);display:flex;align-items:center;justify-content:center;font-weight:800;color:white}
+
+    /* small helper */
+    .muted{color:var(--muted);font-size:13px}
+    .flex{display:flex;gap:10px;align-items:center}
+    .right{margin-left:auto}
+    .tiny{font-size:12px;color:var(--muted)}
+
+    /* subtle animated gradient border */
+    .glow-ring{position:relative;padding:2px;border-radius:16px}
+    .glow-ring:before{
+      content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;
+      background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      pointer-events:none;
+    }
+
+    /* tiny responsive adjustments */
+    @media(max-width:520px){
+      .controls{flex-direction:column;align-items:stretch}
+      .header{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="header card">
+      <div class="title">
+        <h1>STL‑UDHIS — Offline Tabungan</h1>
+        <div class="sub">iOS‑26 Epic Theme — Offline & Encrypted • Fokus: Guru (Pribadi / BOS / Lainnya)</div>
+      </div>
+
+      <div class="controls">
+        <div class="flex">
+          <button id="exportPDF" class="btn btn-primary"><i class="fas fa-file-pdf"></i>&nbsp;PDF</button>
+          <button id="exportImg" class="btn"><i class="fas fa-image"></i>&nbsp;PNG</button>
+          <button id="exportXLSX" class="btn"><i class="fas fa-file-excel"></i>&nbsp;XLSX</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Developer card -->
+    <section style="margin-top:18px" class="card">
+      <div style="display:flex;align-items:center;gap:12px;justify-content:space-between">
+        <div>
+          <div style="font-weight:900">Developer — ppgmuhammadsalam96930‑design</div>
+          <div class="tiny">Contact: najibsalam23@gmail.com • Security: AES‑GCM (WebCrypto) • Storage: IndexedDB</div>
+        </div>
+        <div class="tiny">Version: offline-tabungan-v2 • Local-first</div>
+      </div>
+    </section>
+
+    <main style="margin-top:16px" class="grid">
+      <!-- LEFT: main app -->
+      <div>
+        <section class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-weight:900">Tambah Transaksi</div>
+              <div class="tiny muted">Masukkan pemasukan / pengeluaran per rekening</div>
+            </div>
+            <div class="tiny muted">Encrypted • Offline</div>
+          </div>
+
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <select id="accountType" class="enhanced">
+              <option value="pribadi">Tabungan Pribadi</option>
+              <option value="bos">Tabungan BOS</option>
+              <option value="lain">Lain‑lain</option>
+            </select>
+            <select id="txType" class="enhanced">
+              <option value="debit">Pemasukan</option>
+              <option value="kredit">Pengeluaran</option>
+            </select>
+          </div>
+
+          <div style="margin-top:10px;display:grid;grid-template-columns:1fr 160px;gap:8px">
+            <input id="amount" class="enhanced" type="number" placeholder="Jumlah (Rp)">
+            <input id="date" class="enhanced" type="date" value="">
+          </div>
+
+          <div style="margin-top:10px"><input id="note" class="enhanced" placeholder="Keterangan"></div>
+
+          <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+            <button id="addTx" class="btn btn-primary"><i class="fas fa-plus-circle"></i>&nbsp;Tambah</button>
+            <button id="newAccount" class="btn"><i class="fas fa-wallet"></i>&nbsp;Buat Rekening Baru</button>
+            <div class="right tiny muted">Saldo Total: <span id="totalBalance">Rp 0</span></div>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-weight:900">Riwayat Transaksi</div>
+            <div class="tiny muted">Paling baru di atas</div>
+          </div>
+          <table id="txTable">
+            <thead><tr><th>Tanggal</th><th>Jenis</th><th>Rek</th><th>Jumlah</th><th>Keterangan</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- RIGHT: settings & theme -->
+      <aside>
+        <section class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-weight:900">Tema & Font</div>
+            <div class="tiny muted">iOS‑26 presets</div>
+          </div>
+
+          <div style="margin-top:10px">
+            <label class="small">Pilih Font</label>
+            <select id="fontSelector" class="enhanced">
+              <option value="'Inter', system-ui">Inter</option>
+              <option value="'Poppins', system-ui">Poppins</option>
+              <option value="'Nunito Sans', system-ui">Nunito Sans</option>
+              <option value="'Roboto', system-ui">Roboto</option>
+            </select>
+
+            <label class="small" style="margin-top:10px">Preset Tema</label>
+            <div class="swatches" style="margin-top:8px">
+              <div class="swatch" id="themeOcean" style="background:linear-gradient(135deg,#06b6d4,#2563eb)">OC</div>
+              <div class="swatch" id="themeSunrise" style="background:linear-gradient(135deg,#ff8a65,#ff5252)">SR</div>
+              <div class="swatch" id="themeAurora" style="background:linear-gradient(135deg,#7c3aed,#06b6d4)">AU</div>
+              <div class="swatch" id="themeMidnight" style="background:linear-gradient(135deg,#0f1724,#071022)">MD</div>
+            </div>
+
+            <label class="small" style="margin-top:12px">Custom Primary</label>
+            <input type="color" id="primaryColor" value="#667eea" class="enhanced" style="height:44px;padding:6px">
+
+            <label class="small" style="margin-top:12px">Glow Intensity</label>
+            <input type="range" id="glow" min="0" max="40" value="14" style="width:100%">
+
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button id="applyTheme" class="btn btn-primary">Terapkan</button>
+              <button id="exportTheme" class="btn">Ekspor Tema</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-weight:900">Backup & Keamanan</div>
+            <div class="tiny muted">Encrypted</div>
+          </div>
+          <div style="margin-top:8px" class="tiny muted">Simpan / Pulihkan file backup terenkripsi (AES‑GCM).</div>
+          <input id="backupPass" class="enhanced" placeholder="Passphrase backup (opsional)">
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="backupBtn" class="btn btn-primary">Buat Backup</button>
+            <button id="restoreBtn" class="btn">Pulihkan</button>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:12px">
+          <div style="font-weight:900">Developer Info</div>
+          <div class="tiny muted" style="margin-top:6px">ppgmuhammadsalam96930‑design • najibsalam23@gmail.com</div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+  // -----------------------
+  // State + helpers (kept from previous)
+  // -----------------------
+  const STATE = { accounts: [], txs: [] };
+
+  function formatRp(n){ try{ return 'Rp '+Number(n).toLocaleString('id-ID'); }catch(e){return 'Rp 0'} }
+
+  function abToBase64(buf){ const bytes=new Uint8Array(buf); let bin=''; for(let i=0;i<bytes.byteLength;i++) bin+=String.fromCharCode(bytes[i]); return btoa(bin); }
+  function base64ToAb(base64){ const binary=atob(base64); const len=binary.length; const bytes=new Uint8Array(len); for(let i=0;i<len;i++) bytes[i]=binary.charCodeAt(i); return bytes.buffer; }
+
+  const IDB = (function(){
+    const dbName='stl_offline_tabungan_v2'; const store='data'; let db=null;
+    function open(){ if(db) return Promise.resolve(db); return new Promise((res,rej)=>{ const r=indexedDB.open(dbName,1); r.onupgradeneeded=e=>{ const d=e.target.result; if(!d.objectStoreNames.contains(store)) d.createObjectStore(store,{keyPath:'key'}); }; r.onsuccess=()=>{ db=r.result; res(db) }; r.onerror=()=>rej(r.error); }); }
+    async function put(key,value){ const d=await open(); return new Promise((res,rej)=>{ const tx=d.transaction([store],'readwrite'); const s=tx.objectStore(store); const rq=s.put({key,value}); rq.onsuccess=()=>res(true); rq.onerror=()=>rej(rq.error); })}
+    async function get(key){ const d=await open(); return new Promise((res,rej)=>{ const tx=d.transaction([store],'readonly'); const s=tx.objectStore(store); const rq=s.get(key); rq.onsuccess=()=>res(rq.result?rq.result.value:null); rq.onerror=()=>rej(rq.error); })}
+    async function del(key){ const d=await open(); return new Promise((res,rej)=>{ const tx=d.transaction([store],'readwrite'); const s=tx.objectStore(store); const rq=s.delete(key); rq.onsuccess=()=>res(true); rq.onerror=()=>rej(rq.error); })}
+    return {put,get,del};
+  })();
+
+  async function deriveKeyFromPassphrase(passphrase, saltBase64){
+    const iterations=150000; const enc=new TextEncoder(); const passKey=await crypto.subtle.importKey('raw',enc.encode(passphrase),{name:'PBKDF2'},false,['deriveBits']);
+    const salt=saltBase64?base64ToAb(saltBase64):crypto.getRandomValues(new Uint8Array(16)).buffer;
+    const derived=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations,hash:'SHA-256'},passKey,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+    return {key:derived,saltBase64:abToBase64(salt)};
+  }
+
+  async function aesGcmEncrypt(key, plaintext){ const iv=crypto.getRandomValues(new Uint8Array(12)); const enc=new TextEncoder(); const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc.encode(plaintext)); return {ciphertextBase64:abToBase64(ct),ivBase64:abToBase64(iv.buffer)} }
+  async function aesGcmDecrypt(key,ciphertextBase64,ivBase64){ const ct=base64ToAb(ciphertextBase64); const iv=base64ToAb(ivBase64); const ptBuf=await crypto.subtle.decrypt({name:'AES-GCM',iv:new Uint8Array(iv)},key,ct); return new TextDecoder().decode(ptBuf); }
+
+  async function createEncryptedBackup(passphrase){ const raw=JSON.stringify(STATE); const {key,saltBase64}=await deriveKeyFromPassphrase(passphrase); const res=await aesGcmEncrypt(key,raw); const packaged={ciphertext:res.ciphertextBase64,iv:res.ivBase64,salt:saltBase64,created:new Date().toISOString()}; return packaged; }
+  async function restoreEncryptedBackup(packaged, passphrase){ const {key}=await deriveKeyFromPassphrase(passphrase,packaged.salt); const pt=await aesGcmDecrypt(key,packaged.ciphertext,packaged.iv); const obj=JSON.parse(pt); Object.assign(STATE,obj); renderAll(); await saveLocal(); }
+
+  async function saveLocal(){ await IDB.put('stl_state',STATE); }
+  async function loadLocal(){ const s=await IDB.get('stl_state'); if(s) Object.assign(STATE,s); renderAll(); }
+
+  // -----------------------
+  // UI Rendering
+  // -----------------------
+  function renderAccounts(){ const el=document.getElementById('accountsList'); if(!el){ return; } el.innerHTML=''; STATE.accounts.forEach(ac=>{ const div=document.createElement('div'); div.className='tiny'; div.style.margin='8px 0'; div.innerHTML=`<span class="account-pill">${ac.name}</span> <span style="margin-left:10px">${ac.type}</span> <span style="float:right;font-weight:900">${formatRp(ac.balance)}</span>`; el.appendChild(div); }); updateTotal(); }
+  function renderTxs(){ const tbody=document.querySelector('#txTable tbody'); tbody.innerHTML=''; STATE.txs.slice().reverse().forEach(tx=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${tx.date}</td><td>${tx.kind}</td><td>${tx.account}</td><td>${formatRp(tx.amount)}</td><td>${tx.note}</td>`; tbody.appendChild(tr); }); }
+  function updateTotal(){ const total=STATE.accounts.reduce((s,a)=>s+Number(a.balance||0),0); const el=document.getElementById('totalBalance'); if(el) el.textContent=formatRp(total); }
+
+  function renderAll(){ renderAccounts(); renderTxs(); }
+
+  // Add account
+  document.getElementById('newAccount').addEventListener('click', ()=>{
+    const name=prompt('Nama rekening (contoh: BOS 2025):'); if(!name) return; const type=prompt('Tipe (pribadi/bos/lain)', 'pribadi')||'pribadi'; const acc={id:Date.now(),name,type,balance:0}; STATE.accounts.push(acc); saveLocal(); renderAll(); });
+
+  // Add transaction
+  document.getElementById('addTx').addEventListener('click', ()=>{
+    const accountType=document.getElementById('accountType').value; const kind=document.getElementById('txType').value; const amount=Number(document.getElementById('amount').value||0); const date=document.getElementById('date').value||new Date().toISOString().split('T')[0]; const note=document.getElementById('note').value||'';
+    const account = STATE.accounts.find(a=>a.type===accountType) || (STATE.accounts[0]||null);
+    if(!account){ alert('Buat rekening dulu (klik Buat Rekening Baru)'); return; }
+    const tx={id:Date.now(),date,kind,account:account.name,amount:kind==='debit'?amount:-amount,note};
+    STATE.txs.push(tx);
+    account.balance = Number(account.balance||0) + (kind==='debit'?amount:-amount);
+    saveLocal(); renderAll(); document.getElementById('amount').value=''; document.getElementById('note').value='';
+  });
+
+  // Backup / restore
+  document.getElementById('backupBtn').addEventListener('click', async ()=>{
+    const pass=document.getElementById('backupPass').value||prompt('Masukkan passphrase untuk backup (harus diingat):'); if(!pass) return;
+    const pkg = await createEncryptedBackup(pass);
+    const blob = new Blob([JSON.stringify(pkg,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='stl_tabungan_backup_'+new Date().toISOString().split('T')[0]+'.json'; a.click(); URL.revokeObjectURL(url);
+    alert('Backup terenkripsi dibuat (download). Simpan passphrase dengan aman.');
+  });
+
+  document.getElementById('restoreBtn').addEventListener('click', ()=>{
+    const input=document.createElement('input'); input.type='file'; input.accept='.json'; input.onchange=async e=>{
+      const file=e.target.files[0]; const txt = await file.text(); try{ const pkg=JSON.parse(txt); const pass=prompt('Masukkan passphrase untuk memulihkan backup:'); await restoreEncryptedBackup(pkg,pass); alert('Restore berhasil'); }catch(err){ alert('Restore gagal: '+err.message); }
+    }; input.click();
+  });
+
+  // Exports
+  document.getElementById('exportPDF').addEventListener('click', async ()=>{
+    const el=document.querySelector('.wrap'); const canvas=await html2canvas(el,{scale:2}); const imgData=canvas.toDataURL('image/jpeg',0.95);
+    const { jsPDF } = window.jspdf; const pdf = new jsPDF({orientation:'portrait',unit:'pt',format:'a4'});
+    const width=pdf.internal.pageSize.getWidth(); pdf.addImage(imgData,'JPEG',20,20,width-40,(canvas.height/canvas.width)*(width-40)); pdf.save('laporan_tabungan_'+new Date().toISOString().split('T')[0]+'.pdf');
+  });
+
+  document.getElementById('exportImg').addEventListener('click', async ()=>{
+    const el=document.querySelector('.wrap'); const canvas=await html2canvas(el,{scale:2}); const url=canvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download='laporan_tabungan_'+new Date().toISOString().split('T')[0]+'.png'; a.click();
+  });
+
+  document.getElementById('exportXLSX').addEventListener('click', ()=>{
+    const ws_data = [['Tanggal','Jenis','Rekening','Jumlah','Keterangan']].concat(STATE.txs.map(t=>[t.date,t.kind,t.account,t.amount,t.note]));
+    const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(ws_data); XLSX.utils.book_append_sheet(wb,ws,'Transaksi'); XLSX.writeFile(wb,'laporan_tabungan_'+new Date().toISOString().split('T')[0]+'.xlsx');
+  });
+
+  // Theme controls
+  function applyPrimaryColor(hex){
+    document.documentElement.style.setProperty('--primary', hex);
+    // derive accent as slightly shifted color (simple approach)
+    try{
+      const c = hex.replace('#','');
+      const r = parseInt(c.substring(0,2),16);
+      const g = parseInt(c.substring(2,4),16);
+      const b = parseInt(c.substring(4,6),16);
+      // simple rotate for accent
+      const ax = (r+30)%256, ay=(g+20)%256, az=(b+60)%256;
+      const accent = '#' + ax.toString(16).padStart(2,'0') + ay.toString(16).padStart(2,'0') + az.toString(16).padStart(2,'0');
+      document.documentElement.style.setProperty('--accent', accent);
+    }catch(e){}
+  }
+
+  // preset handlers
+  document.getElementById('themeOcean').addEventListener('click', ()=>{ document.documentElement.className='theme-ocean'; applyPrimaryColor('#06b6d4'); document.getElementById('primaryColor').value='#06b6d4'; });
+  document.getElementById('themeSunrise').addEventListener('click', ()=>{ document.documentElement.className='theme-sunrise'; applyPrimaryColor('#ff8a65'); document.getElementById('primaryColor').value='#ff8a65'; });
+  document.getElementById('themeAurora').addEventListener('click', ()=>{ document.documentElement.className='theme-aurora'; applyPrimaryColor('#7c3aed'); document.getElementById('primaryColor').value='#7c3aed'; });
+  document.getElementById('themeMidnight').addEventListener('click', ()=>{ document.documentElement.className='theme-midnight'; applyPrimaryColor('#2dd4bf'); document.getElementById('primaryColor').value='#2dd4bf'; });
+
+  document.getElementById('applyTheme').addEventListener('click', ()=>{
+    const hex = document.getElementById('primaryColor').value;
+    applyPrimaryColor(hex);
+    const glow = Number(document.getElementById('glow').value);
+    document.documentElement.style.setProperty('--glow-strength', (glow/100).toFixed(3));
+    alert('Tema diterapkan — warna primer & glow telah diperbarui.');
+  });
+
+  document.getElementById('fontSelector').addEventListener('change', (e)=>{ document.body.style.fontFamily = e.target.value; });
+
+  document.getElementById('exportTheme').addEventListener('click', ()=>{
+    const theme = { primary: document.getElementById('primaryColor').value, glow: document.getElementById('glow').value, font: document.getElementById('fontSelector').value, presetClass: document.documentElement.className || '' };
+    const blob = new Blob([JSON.stringify(theme,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='stl_theme_'+new Date().toISOString().split('T')[0]+'.json'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  // initialize
+  (async function(){
+    await loadLocal();
+    if(STATE.accounts.length===0){
+      STATE.accounts.push({id:1,name:'Pribadi',type:'pribadi',balance:0});
+      STATE.accounts.push({id:2,name:'BOS',type:'bos',balance:0});
+      await saveLocal();
+    }
+    renderAll();
+  })();
+
+  </script>
+</body>
+</html>
