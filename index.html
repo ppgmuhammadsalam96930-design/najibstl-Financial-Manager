@@ -5023,6 +5023,271 @@ document.addEventListener('DOMContentLoaded', function() {
 // Expose ke global scope untuk integrasi
 window.MONGODB_STORAGE_MANAGER = MONGODB_STORAGE_MANAGER;
 </script>
+<script>
+// ==================== INJEKSI MONGODB FRONTEND DEDICATED MAX ====================
+const MongoDBInjector = {
+    // Ganti dengan URL Vercel Anda (misal: https://stl-small-bank.vercel.app)
+    BASE_API_URL: window.location.origin + '/api/sync',
+    
+    // Simulasikan Auth/Login untuk mendapatkan User ID yang unik (Anda bisa gunakan Google Login di sini)
+    getUserId() {
+        // PERHATIAN: Diimplementasi nyata, Anda harus menggunakan Google Sign-In
+        // seperti yang saya jelaskan untuk mendapatkan User ID yang AMAN.
+        // Untuk saat ini, kita akan pakai ID dummy.
+        return localStorage.getItem('user_id_v2') || 'GUEST-12345';
+    },
+
+    // Pengganti utama untuk window.saveData() dan window.loadSavedData()
+    async saveToCloud() {
+        const uid = this.getUserId();
+        if (uid === 'GUEST-12345') {
+            alert('Silakan login untuk menyimpan data ke cloud.');
+            return;
+        }
+
+        // Ambil data dari state global aplikasi Anda
+        const payload = {
+            FINANCIAL_STATE: window.FINANCIAL_STATE,
+            ACCOUNT_STATE: window.ACCOUNT_STATE,
+        };
+
+        try {
+            // KIRIM data ke perantara aman (Vercel Function)
+            const response = await fetch(this.BASE_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ uid: uid, data: payload })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                console.log('✅ MongoDB Sync Sukses:', result.message);
+                if(window.updateDynamicIsland) updateDynamicIsland('☁️ Data tersinkronisasi ke MongoDB', 1500);
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            console.error('❌ Sync Gagal:', error);
+            if(window.showAccountMessage) showAccountMessage('Gagal sinkronisasi MongoDB: ' + error.message, 'error');
+        }
+    }
+};
+
+// GANTI FUNGSI SAVE DATA GLOBAL
+document.addEventListener('DOMContentLoaded', () => {
+    // Ganti fungsi saveData yang ada
+    window.saveData = function() {
+        // Pertama, simpan ke localStorage sebagai backup (opsional)
+        // [Kode localStorage lama Anda di sini]
+        
+        // Kedua, kirim ke cloud
+        MongoDBInjector.saveToCloud();
+    };
+    
+    // Ganti tombol sinkronisasi (jika ada)
+    const syncBtn = document.getElementById('syncData');
+    if(syncBtn) {
+        syncBtn.addEventListener('click', window.saveData);
+        syncBtn.innerHTML = '<i class="fas fa-database"></i> Sync MongoDB';
+    }
+});
+</script>
+<script>
+    const firebaseConfig = {
+        apiKey: "API_KEY_ANDA_DI_SINI", 
+        authDomain: "AUTH_DOMAIN_ANDA_DI_SINI",
+        projectId: "PROJECT_ID_ANDA_DI_SINI",
+        // ... detail konfigurasi lainnya
+    };
+
+    let fb_auth, fb_db;
+
+    try {
+        const firebaseApp = firebase.initializeApp(firebaseConfig);
+        fb_auth = firebase.auth();
+        fb_db = firebase.firestore();
+        console.log('🔥 Firebase Injected and Initialized.');
+    } catch (e) {
+        console.error('❌ Gagal Inisialisasi Firebase:', e);
+        // Tampilkan pesan error jika inisialisasi gagal (misal: config salah)
+        if(window.showSystemAlert) showSystemAlert('Koneksi Firebase Gagal. Cek konfigurasi Anda.', 'error');
+    }
+
+    // ========== AUTHENTICATOR (MENGGANTIKAN unlockRekening LAMA) ==========
+    const FirebaseAuthenticator = {
+        currentUser: null,
+
+        // Panggil fungsi ini dari tombol "Login" Anda
+        signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            // Minta Firebase untuk menggunakan mode pop-up
+            fb_auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Login sukses:', result.user.displayName);
+                    // Tidak perlu melakukan apa-apa lagi di sini, onAuthStateChanged yang akan menangani
+                })
+                .catch((error) => {
+                    console.error('Login Gagal:', error);
+                    // Tampilkan pesan error login di UI (jika ada fungsi notifikasi)
+                    if(window.showAccountMessage) showAccountMessage('Login Google Gagal: ' + error.message, 'error');
+                });
+        },
+
+        // Panggil fungsi ini dari tombol "Kunci" atau "Logout"
+        signOut() {
+            fb_auth.signOut().then(() => {
+                // Clear state lokal setelah logout
+                this.currentUser = null;
+                // Panggil fungsi bawaan aplikasi Anda untuk membersihkan/mengunci UI
+                if(typeof window.lockRekening === 'function') window.lockRekening();
+                if(window.showAccountMessage) showAccountMessage('Berhasil Logout.', 'success');
+            });
+        },
+        
+        // Listener utama yang berjalan saat status login berubah
+        initAuthListener() {
+            fb_auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Pengguna SUDAH login
+                    this.currentUser = user;
+                    console.log('🇬 User logged in:', user.displayName, user.uid);
+                    
+                    // Ganti UI ke mode "unlocked"
+                    document.getElementById('rekeningAuth').style.display = 'none';
+                    document.getElementById('rekeningContent').style.display = 'block';
+                    
+                    // --- FUNGSI PENTING: MUAT DATA ---
+                    FirebaseDataManager.loadAllData(user.uid);
+                    
+                    // Update Dynamic Island
+                    if(window.updateDynamicIsland) updateDynamicIsland(`Selamat datang, ${user.displayName}!`, 3000);
+                } else {
+                    // Pengguna TIDAK login
+                    this.currentUser = null;
+                    console.log('🇬 User logged out or not signed in.');
+                    
+                    // Ganti UI ke mode "locked"
+                    document.getElementById('rekeningAuth').style.display = 'block';
+                    document.getElementById('rekeningContent').style.display = 'none';
+                }
+            });
+        }
+    };
+
+    // ========== DATA MANAGER (PENGGANTI saveData/loadSavedData) ==========
+    const FirebaseDataManager = {
+
+        // Menggantikan window.saveData()
+        async saveAllData(uid) {
+            if (!uid) {
+                if(window.showAccountMessage) showAccountMessage('Harap login untuk menyimpan ke cloud.', 'warning');
+                return;
+            }
+            
+            const userDocRef = fb_db.collection('userData').doc(uid);
+            
+            try {
+                // Ambil state terbaru dari variabel global aplikasi Anda
+                const dataToSave = {
+                    FINANCIAL_STATE: window.FINANCIAL_STATE, // Asumsi variabel global Anda ada
+                    ACCOUNT_STATE: window.ACCOUNT_STATE,     // Asumsi variabel global Anda ada
+                };
+
+                await userDocRef.set({
+                    payload: dataToSave,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log('☁️ Data berhasil disimpan ke Firebase');
+                if(window.updateDynamicIsland) updateDynamicIsland('☁️ Data tersinkronisasi ke cloud', 1500);
+                
+            } catch (error) {
+                console.error('Error saving to Firestore:', error);
+                if(window.showAccountMessage) showAccountMessage('Gagal sinkronisasi data: ' + error.message, 'error');
+            }
+        },
+
+        // Menggantikan window.loadSavedData()
+        async loadAllData(uid) {
+            const userDocRef = fb_db.collection('userData').doc(uid);
+            
+            try {
+                const doc = await userDocRef.get();
+                
+                if (doc.exists && doc.data().payload) {
+                    const data = doc.data().payload;
+                    
+                    // Muat data ke variabel global Anda
+                    Object.assign(window.FINANCIAL_STATE, data.FINANCIAL_STATE);
+                    Object.assign(window.ACCOUNT_STATE, data.ACCOUNT_STATE);
+                    
+                    console.log('☁️ Data berhasil dimuat dari Firebase');
+                } else {
+                    console.log('☁️ Data cloud kosong, menggunakan data lokal/kosong.');
+                    // Di sini Anda bisa memanggil fungsi inisialisasi data kosong jika perlu.
+                }
+                
+                // Panggil semua fungsi render ulang aplikasi Anda
+                if(window.updateDashboard) updateDashboard();
+                if(window.renderTransactions) renderTransactions();
+                if(window.updateAccountsDisplay) updateAccountsDisplay();
+                
+            } catch (error) {
+                console.error('Error loading from Firestore:', error);
+                if(window.showAccountMessage) showAccountMessage('Gagal memuat data cloud: ' + error.message, 'error');
+            }
+        }
+    };
+
+
+    // ========== INJEKSI DOM DAN WRAPPER ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. MULAI LISTENER AUTHENTIKASI
+        if (fb_auth) FirebaseAuthenticator.initAuthListener();
+        
+        // 2. GANTI FUNGSI SAVE DATA GLOBAL
+        const oldSaveData = window.saveData; // Simpan fungsi lama jika Anda ingin tetap menyimpan ke localStorage
+        window.saveData = function() {
+            // Pertama, tetap panggil fungsi simpan data lama (untuk backup lokal)
+            if (typeof oldSaveData === 'function') oldSaveData();
+
+            // Kedua, simpan ke cloud jika sudah login
+            const uid = FirebaseAuthenticator.currentUser?.uid;
+            if (uid) {
+                FirebaseDataManager.saveAllData(uid);
+            }
+        };
+
+        // 3. WIRE TOMBOL LOGIN/LOGOUT
+        const unlockButton = document.getElementById('unlockRekening');
+        if(unlockButton) {
+            // Hapus listener lama jika ada (penting untuk mencegah double-call)
+            unlockButton.replaceWith(unlockButton.cloneNode(true));
+            const newUnlockButton = document.getElementById('unlockRekening');
+            
+            // Ganti teks dan event ke Google Login
+            newUnlockButton.innerHTML = '<i class="fab fa-google mr-2"></i> Login dengan Google';
+            newUnlockButton.addEventListener('click', () => {
+                // Notifikasi browser akan hilang jika diakses via HTTPS
+                FirebaseAuthenticator.signInWithGoogle();
+            });
+            
+            // Sembunyikan input passphrase lama
+            const passInput = document.getElementById('rekeningPassphrase');
+            if(passInput) passInput.style.display = 'none';
+        }
+
+        const lockButton = document.getElementById('lockRekening');
+        if(lockButton) {
+            lockButton.replaceWith(lockButton.cloneNode(true));
+            const newLockButton = document.getElementById('lockRekening');
+            newLockButton.innerHTML = '<i class="fas fa-sign-out-alt mr-2"></i> Logout';
+            newLockButton.addEventListener('click', FirebaseAuthenticator.signOut);
+        }
+    });
+
+    // ==================== AKHIR DARI INJEKSI FIREBASE ====================
+</script>
 <!-- Tambahkan tombol game dinosaurus di atas tombol currency -->
 <button id="openDinoGame" class="dino-game-toggle">
     <i class="fas fa-dragon"></i>
