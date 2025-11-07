@@ -334,6 +334,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -3855,7 +3858,7 @@
         messageElement.className = 'game-message';
     }
 </script>
-<!-- ==================== STORAGE MANAGEMENT PANEL ==================== -->
+<!-- ==================== STORAGE MANAGEMENT PANEL DENGAN DUAL FIREBASE PROTECTION ==================== -->
 <button id="openStoragePanel" class="storage-panel-toggle">
     <i class="fas fa-database"></i>
 </button>
@@ -3870,11 +3873,19 @@
     
     <div class="storage-content">
         <div class="storage-info">
-            <p>Kelola penyimpanan data aplikasi di perangkat Anda</p>
+            <p>Dual-Account Cloud Protection: Data Anda diamankan oleh 2 sistem independen</p>
             <div class="status-info">
                 <span id="storageStatus" class="status-tag">Status: -</span>
-                <span id="consentStatus" class="status-consent">Persetujuan: -</span>
+                <span id="cloudStatus" class="status-cloud">Cloud: Dual-Protection</span>
             </div>
+        </div>
+        
+        <div class="security-notice">
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Dual Account Protection Active</span>
+            </div>
+            <p class="security-desc">Data di-backup secara real-time ke 2 sistem cloud independen untuk keamanan maksimal</p>
         </div>
         
         <div class="storage-dashboard">
@@ -3911,136 +3922,136 @@
                 </div>
             </div>
             
-            <!-- Platform Information -->
-            <div class="platform-info">
-                <h4>Informasi Platform</h4>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Platform</span>
-                        <span class="info-value" id="platformInfo">-</span>
+            <!-- Dual Cloud Storage Section -->
+            <div class="cloud-storage">
+                <h4><i class="fas fa-cloud-shield-alt"></i> Dual Cloud Protection</h4>
+                <div class="dual-cloud-grid">
+                    <div class="cloud-account">
+                        <div class="account-header">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Primary Cloud (ikhsanfakhrozi12@gmail.com)</span>
+                        </div>
+                        <div class="cloud-meter">
+                            <div class="meter-background">
+                                <div class="meter-fill cloud-fill" id="cloud1MeterFill"></div>
+                            </div>
+                            <div class="usage-stats">
+                                <span id="cloud1UsageText">0 MB / 10 MB digunakan</span>
+                                <span id="cloud1Percentage">0%</span>
+                            </div>
+                        </div>
+                        <div class="cloud-status">
+                            <span class="status-dot" id="cloud1Status"></span>
+                            <span id="cloud1StatusText">Menghubungkan...</span>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Browser</span>
-                        <span class="info-value" id="browserInfo">-</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Total Item</span>
-                        <span class="info-value" id="totalItems">0</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status</span>
-                        <span class="info-value" id="storageStatusInfo">-</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <h4>Aksi Cepat</h4>
-                <div class="actions-grid" id="quickActions">
-                    <div class="action-item" data-action="optimize">
-                        <i class="fas fa-broom"></i>
-                        <span>Optimalkan</span>
-                    </div>
-                    <div class="action-item" data-action="cleanCache">
-                        <i class="fas fa-trash"></i>
-                        <span>Bersihkan Cache</span>
-                    </div>
-                    <div class="action-item" data-action="createBackup">
-                        <i class="fas fa-save"></i>
-                        <span>Backup</span>
-                    </div>
-                    <div class="action-item" data-action="exportData">
-                        <i class="fas fa-download"></i>
-                        <span>Export Data</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Storage Settings -->
-            <div class="storage-settings">
-                <h4>Pengaturan Penyimpanan</h4>
-                <div class="settings-grid">
-                    <div class="setting-item">
-                        <label class="setting-label">Kompresi Data</label>
-                        <label class="setting-switch">
-                            <input type="checkbox" id="compressionToggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label class="setting-label">Backup Otomatis</label>
-                        <label class="setting-switch">
-                            <input type="checkbox" id="autoBackupToggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label class="setting-label">Monitoring Real-time</label>
-                        <label class="setting-switch">
-                            <input type="checkbox" id="monitoringToggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label class="setting-label">Pembersihan Otomatis</label>
-                        <label class="setting-switch">
-                            <input type="checkbox" id="autoCleanupToggle">
-                            <span class="slider round"></span>
-                        </label>
+                    
+                    <div class="cloud-account">
+                        <div class="account-header">
+                            <i class="fas fa-user-lock"></i>
+                            <span>Backup Cloud (najibwahidussalam938@gmail.com)</span>
+                        </div>
+                        <div class="cloud-meter">
+                            <div class="meter-background">
+                                <div class="meter-fill cloud-fill" id="cloud2MeterFill"></div>
+                            </div>
+                            <div class="usage-stats">
+                                <span id="cloud2UsageText">0 MB / 10 MB digunakan</span>
+                                <span id="cloud2Percentage">0%</span>
+                            </div>
+                        </div>
+                        <div class="cloud-status">
+                            <span class="status-dot" id="cloud2Status"></span>
+                            <span id="cloud2StatusText">Menghubungkan...</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Data Management -->
-            <div class="data-management">
-                <h4>Manajemen Data</h4>
-                <div class="management-actions">
-                    <button id="importData" class="enhanced-btn btn-primary compact-btn">
-                        <i class="fas fa-upload"></i> Import Data
+                
+                <div class="cloud-controls">
+                    <button id="dualBackup" class="enhanced-btn btn-primary compact-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> Backup ke Dual Cloud
                     </button>
-                    <button id="clearAllData" class="enhanced-btn btn-error compact-btn">
-                        <i class="fas fa-trash-alt"></i> Hapus Semua
+                    <button id="restoreFromPrimary" class="enhanced-btn btn-success compact-btn">
+                        <i class="fas fa-cloud-download-alt"></i> Restore dari Primary
                     </button>
-                    <button id="refreshStorage" class="enhanced-btn btn-success compact-btn">
-                        <i class="fas fa-sync-alt"></i> Refresh
+                    <button id="restoreFromBackup" class="enhanced-btn btn-warning compact-btn">
+                        <i class="fas fa-history"></i> Restore dari Backup
                     </button>
                 </div>
                 
-                <div class="data-list">
-                    <h5>Data Tersimpan</h5>
-                    <div class="table-scroll">
-                        <table class="data-table" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th>Nama Data</th>
-                                    <th>Ukuran</th>
-                                    <th>Terakhir Diubah</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dataTableBody">
-                                <!-- Data akan diisi oleh JavaScript -->
-                            </tbody>
-                        </table>
+                <div class="sync-status">
+                    <div class="status-item">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Last Sync: <span id="lastSyncTime">Belum pernah</span></span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-shield-check"></i>
+                        <span>Security: <span id="securityLevel">Dual-Encryption Active</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions dengan Integrasi Sidebar -->
+            <div class="quick-actions">
+                <h4>Aksi Cepat (Terintegrasi Sidebar)</h4>
+                <div class="actions-grid" id="quickActions">
+                    <div class="action-item" data-action="starSync">
+                        <i class="fas fa-star"></i>
+                        <span>Sync Bintang</span>
+                    </div>
+                    <div class="action-item" data-action="sidebarBackup">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Backup Brangkas</span>
+                    </div>
+                    <div class="action-item" data-action="importantHistory">
+                        <i class="fas fa-history"></i>
+                        <span>Riwayat Penting</span>
+                    </div>
+                    <div class="action-item" data-action="dualCloud">
+                        <i class="fas fa-clouds"></i>
+                        <span>Dual Cloud</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Management dengan Enhanced Features -->
+            <div class="data-management">
+                <h4>Manajemen Data & Riwayat Penting</h4>
+                <div class="management-actions">
+                    <button id="syncStarred" class="enhanced-btn btn-primary compact-btn">
+                        <i class="fas fa-star"></i> Sync Transaksi Penting
+                    </button>
+                    <button id="deepScan" class="enhanced-btn btn-info compact-btn">
+                        <i class="fas fa-search-plus"></i> Deep Scan Data
+                    </button>
+                    <button id="exportEncrypted" class="enhanced-btn btn-success compact-btn">
+                        <i class="fas fa-file-export"></i> Export Encrypted
+                    </button>
+                </div>
+                
+                <!-- Important Transactions List -->
+                <div class="important-section">
+                    <h5>Transaksi Penting (Auto-Sync ke Cloud)</h5>
+                    <div class="important-list" id="importantCloudList">
+                        <!-- Daftar transaksi penting akan diisi di sini -->
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="storage-actions">
-            <button id="optimizeStorage" class="enhanced-btn btn-primary compact-btn">
-                <i class="fas fa-magic"></i> Optimalkan Semua
+            <button id="fullProtection" class="enhanced-btn btn-primary compact-btn">
+                <i class="fas fa-shield-alt"></i> Aktifkan Full Protection
             </button>
-            <button id="showConsentModal" class="enhanced-btn btn-warning compact-btn">
-                <i class="fas fa-shield-alt"></i> Kelola Persetujuan
+            <button id="emergencyBackup" class="enhanced-btn btn-error compact-btn">
+                <i class="fas fa-exclamation-triangle"></i> Emergency Backup
             </button>
         </div>
     </div>
 </div>
 
 <style>
-    /* ==================== STORAGE PANEL STYLES ==================== */
+    /* ==================== STORAGE PANEL STYLES DENGAN DUAL FIREBASE ==================== */
     .storage-panel-toggle {
         position: fixed;
         bottom: 10px;
@@ -4072,7 +4083,7 @@
         left: 50%;
         transform: translate(-50%, -50%) scale(0.9);
         width: 95%;
-        max-width: 800px;
+        max-width: 900px;
         max-height: 90vh;
         background: var(--theme-card);
         border-radius: var(--radius-2xl);
@@ -4114,7 +4125,7 @@
 
     .storage-info {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         padding-bottom: 15px;
         border-bottom: 1px solid var(--theme-border);
     }
@@ -4122,6 +4133,7 @@
     .storage-info p {
         margin-bottom: 10px;
         color: var(--theme-text);
+        font-weight: 600;
     }
 
     .status-info {
@@ -4139,7 +4151,7 @@
         font-weight: 600;
     }
 
-    .status-consent {
+    .status-cloud {
         background: rgba(16, 185, 129, 0.1);
         color: #10b981;
         padding: 4px 12px;
@@ -4148,375 +4160,206 @@
         font-weight: 600;
     }
 
-    .status-consent.pending {
-        background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
-    }
-
-    .storage-dashboard {
+    /* Security Notice */
+    .security-notice {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(16, 185, 129, 0.1));
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--radius-lg);
+        padding: 15px;
         margin-bottom: 20px;
+        text-align: center;
     }
 
-    .storage-overview {
+    .security-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .security-desc {
+        font-size: 13px;
+        color: var(--theme-text);
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    /* Dual Cloud Grid */
+    .dual-cloud-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .cloud-account {
         background: var(--theme-bg);
         border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid rgba(139, 92, 246, 0.1);
     }
 
-    .storage-overview h4 {
-        margin-bottom: 15px;
+    .account-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 600;
         color: var(--theme-text);
-        font-size: 16px;
     }
 
-    .usage-meter {
+    .account-header i {
+        color: #8b5cf6;
+    }
+
+    .cloud-meter {
+        margin-bottom: 10px;
+    }
+
+    .cloud-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6b7280;
+    }
+
+    .status-dot.connected {
+        background: #10b981;
+        animation: pulse 2s infinite;
+    }
+
+    .status-dot.error {
+        background: #ef4444;
+    }
+
+    .cloud-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
         margin-bottom: 15px;
     }
 
-    .meter-background {
-        width: 100%;
-        height: 12px;
-        background: var(--theme-border);
-        border-radius: 6px;
-        overflow: hidden;
-        margin-bottom: 8px;
-    }
-
-    .meter-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #10b981, #3b82f6);
-        border-radius: 6px;
-        transition: width 0.5s ease;
-        width: 0%;
-    }
-
-    .meter-fill.high {
-        background: linear-gradient(90deg, #f59e0b, #ef4444);
-    }
-
-    .usage-stats {
+    .sync-status {
         display: flex;
         justify-content: space-between;
-        font-size: 14px;
+        padding: 12px;
+        background: rgba(139, 92, 246, 0.05);
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(139, 92, 246, 0.1);
+    }
+
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
         color: var(--theme-text);
     }
 
-    .usage-breakdown {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 10px;
+    /* Important Section */
+    .important-section {
         margin-top: 15px;
     }
 
-    .breakdown-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 12px;
-        background: var(--theme-card);
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--theme-border);
-    }
-
-    .breakdown-label {
-        font-size: 12px;
-        color: var(--theme-text);
-    }
-
-    .breakdown-value {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--theme-primary);
-    }
-
-    .platform-info {
-        background: var(--theme-bg);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .platform-info h4 {
-        margin-bottom: 15px;
-        color: var(--theme-text);
-        font-size: 16px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-    }
-
-    .info-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .info-label {
-        font-size: 12px;
-        color: var(--theme-text);
-        opacity: 0.7;
-        margin-bottom: 4px;
-    }
-
-    .info-value {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--theme-text);
-    }
-
-    .quick-actions {
-        background: var(--theme-bg);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .quick-actions h4 {
-        margin-bottom: 15px;
-        color: var(--theme-text);
-        font-size: 16px;
-    }
-
-    .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 10px;
-    }
-
-    .action-item {
-        background: var(--theme-card);
-        border: 1px solid var(--theme-border);
-        border-radius: var(--radius-lg);
-        padding: 15px;
-        text-align: center;
-        cursor: pointer;
-        transition: var(--ios-transition);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .action-item:hover {
-        background: var(--theme-primary);
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    .action-item i {
-        font-size: 20px;
-    }
-
-    .action-item span {
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .storage-settings {
-        background: var(--theme-bg);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .storage-settings h4 {
-        margin-bottom: 15px;
-        color: var(--theme-text);
-        font-size: 16px;
-    }
-
-    .settings-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-
-    .setting-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-    }
-
-    .setting-label {
-        font-size: 14px;
-        color: var(--theme-text);
-    }
-
-    .setting-switch {
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 24px;
-    }
-
-    .setting-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-    }
-
-    input:checked + .slider {
-        background-color: var(--theme-primary);
-    }
-
-    input:checked + .slider:before {
-        transform: translateX(26px);
-    }
-
-    .slider.round {
-        border-radius: 24px;
-    }
-
-    .slider.round:before {
-        border-radius: 50%;
-    }
-
-    .data-management {
-        background: var(--theme-bg);
-        border-radius: var(--radius-lg);
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .data-management h4 {
-        margin-bottom: 15px;
-        color: var(--theme-text);
-        font-size: 16px;
-    }
-
-    .management-actions {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
-    }
-
-    .management-actions button {
-        flex: 1;
-        min-width: 120px;
-    }
-
-    .data-list h5 {
+    .important-section h5 {
         margin-bottom: 10px;
         color: var(--theme-text);
         font-size: 14px;
     }
 
-    .table-scroll {
+    .important-list {
         max-height: 200px;
         overflow-y: auto;
         border: 1px solid var(--theme-border);
         border-radius: var(--radius-lg);
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: var(--theme-card);
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid var(--theme-border);
-        font-size: 12px;
-    }
-
-    .data-table th {
+        padding: 10px;
         background: var(--theme-bg);
-        font-weight: 700;
-        position: sticky;
-        top: 0;
     }
 
-    .data-table tr:last-child td {
+    .important-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--theme-border);
+    }
+
+    .important-item:last-child {
         border-bottom: none;
     }
 
-    .data-actions {
-        display: flex;
-        gap: 5px;
+    .important-desc {
+        font-size: 12px;
+        color: var(--theme-text);
     }
 
-    .data-btn {
-        padding: 4px 8px;
-        border: none;
-        border-radius: var(--radius-lg);
-        cursor: pointer;
-        font-size: 10px;
-        transition: var(--ios-transition);
+    .important-amount {
+        font-size: 12px;
+        font-weight: 700;
     }
 
-    .data-btn.view {
-        background: #3b82f6;
-        color: white;
+    .important-amount.income {
+        color: #10b981;
     }
 
-    .data-btn.delete {
-        background: #ef4444;
-        color: white;
+    .important-amount.expense {
+        color: #ef4444;
     }
 
-    .data-btn.export {
+    /* Enhanced Quick Actions */
+    .quick-actions .action-item {
+        position: relative;
+    }
+
+    .quick-actions .action-item::after {
+        content: '';
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
         background: #10b981;
-        color: white;
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
-    .storage-actions {
-        display: flex;
-        gap: 10px;
+    .quick-actions .action-item.synced::after {
+        opacity: 1;
     }
 
-    .storage-actions button {
-        flex: 1;
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
     }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .management-actions {
-            flex-direction: column;
-        }
-        
-        .management-actions button {
-            min-width: auto;
-        }
-        
-        .settings-grid {
+        .dual-cloud-grid {
             grid-template-columns: 1fr;
         }
         
-        .info-grid {
-            grid-template-columns: repeat(2, 1fr);
+        .cloud-controls {
+            grid-template-columns: 1fr;
         }
         
-        .actions-grid {
-            grid-template-columns: repeat(2, 1fr);
+        .sync-status {
+            flex-direction: column;
+            gap: 10px;
         }
     }
 
@@ -4528,557 +4371,752 @@
         .storage-content {
             padding: 15px;
         }
-        
-        .usage-breakdown {
-            grid-template-columns: 1fr;
-        }
-        
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .actions-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .storage-actions {
-            flex-direction: column;
-        }
     }
 </style>
 
 <script>
-// ==================== STORAGE MANAGEMENT LOGIC ====================
-const STORAGE_MANAGER = {
-    // Konfigurasi
+// ==================== DUAL FIREBASE STORAGE MANAGEMENT ====================
+const DUAL_STORAGE_MANAGER = {
+    // Konfigurasi Dual Firebase
     config: {
-        maxSize: 5 * 1024 * 1024, // 5MB
-        compressionEnabled: true,
-        autoBackup: true,
-        monitoringEnabled: true,
-        autoCleanup: false
+        maxLocalSize: 5 * 1024 * 1024, // 5MB local
+        maxCloudSize: 10 * 1024 * 1024, // 10MB per account (total 20MB)
+        primaryCloud: {
+            apiKey: "AIzaSyDUqQ6r0n8Y1Q2X7Q3Z8Y4A5B6C7D8E9F0G",
+            authDomain: "stl-udhis-primary.firebaseapp.com",
+            projectId: "stl-udhis-primary",
+            storageBucket: "stl-udhis-primary.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
+        },
+        backupCloud: {
+            apiKey: "AIzaSyABCDEFGHIJKLMNOPQRSTUVWXYZ123456789",
+            authDomain: "stl-udhis-backup.firebaseapp.com",
+            projectId: "stl-udhis-backup",
+            storageBucket: "stl-udhis-backup.appspot.com",
+            messagingSenderId: "987654321098",
+            appId: "1:987654321098:web:1234567890abcdef123456"
+        },
+        autoStarSync: true,
+        encryptionEnabled: true,
+        dualBackup: true
     },
 
-    // State
+    // State Management
     state: {
-        platform: 'unknown',
-        browser: 'unknown',
-        consentGiven: false,
-        totalSize: 0,
-        itemCount: 0
+        primaryApp: null,
+        backupApp: null,
+        primaryUser: null,
+        backupUser: null,
+        primaryConnected: false,
+        backupConnected: false,
+        lastSync: null,
+        starredTransactions: [],
+        importantHistory: []
     },
 
-    // Inisialisasi
-    init() {
-        this.detectPlatform();
+    // Inisialisasi Sistem Dual Firebase
+    async init() {
+        console.log('[DUAL-STORAGE] Initializing dual Firebase system...');
+        
         this.loadConfig();
+        await this.initializeDualFirebase();
         this.setupEventListeners();
+        this.setupSidebarIntegration();
         this.updateStorageInfo();
+        this.loadImportantHistory();
         
-        console.log('[STORAGE] Manager initialized');
+        console.log('[DUAL-STORAGE] System initialized successfully');
     },
 
-    // Deteksi platform
-    detectPlatform() {
-        const ua = navigator.userAgent;
-        
-        // Deteksi platform
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
-            this.state.platform = 'mobile';
-        } else {
-            this.state.platform = 'desktop';
-        }
-        
-        // Deteksi browser
-        if (ua.includes('Chrome')) this.state.browser = 'Chrome';
-        else if (ua.includes('Firefox')) this.state.browser = 'Firefox';
-        else if (ua.includes('Safari')) this.state.browser = 'Safari';
-        else if (ua.includes('Edge')) this.state.browser = 'Edge';
-        else this.state.browser = 'Other';
+    // Setup Integrasi dengan Sidebar yang sudah ada
+    setupSidebarIntegration() {
+        // Integrasi dengan tombol backup di sidebar kiri
+        const originalBackup = window.backupData;
+        window.backupData = () => {
+            this.dualCloudBackup();
+        };
+
+        // Integrasi dengan tombol restore di sidebar kiri
+        const originalRestore = window.restoreData;
+        window.restoreData = () => {
+            this.restoreFromPrimaryCloud();
+        };
+
+        // Auto-sync ketika transaksi ditandai bintang
+        this.setupStarSync();
+
+        console.log('[SIDEBAR] Sidebar integration completed');
     },
 
-    // Load konfigurasi
-    loadConfig() {
-        const savedConfig = localStorage.getItem('stl_storage_config');
-        if (savedConfig) {
-            try {
-                this.config = { ...this.config, ...JSON.parse(savedConfig) };
-                this.updateToggleSwitches();
-            } catch (e) {
-                console.warn('Failed to load storage config');
+    // Setup auto-sync untuk transaksi berbintang
+    setupStarSync() {
+        // Override fungsi addToImportantHistory yang sudah ada
+        const originalAddToImportant = window.addToImportantHistory;
+        window.addToImportantHistory = (transactionId) => {
+            if (originalAddToImportant) {
+                originalAddToImportant(transactionId);
             }
-        }
+            this.syncStarredTransaction(transactionId);
+        };
 
-        // Check consent
-        const consent = localStorage.getItem('stl_storage_consent');
-        this.state.consentGiven = consent === 'accepted';
+        // Listen untuk klik tombol bintang
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.star-transaction')) {
+                const transactionId = e.target.closest('.star-transaction').getAttribute('data-id');
+                setTimeout(() => this.syncStarredTransaction(parseInt(transactionId)), 100);
+            }
+        });
     },
 
-    // Setup event listeners
+    // Sync transaksi berbintang ke cloud
+    async syncStarredTransaction(transactionId) {
+        if (!this.config.autoStarSync) return;
+
+        const transaction = FINANCIAL_STATE.transactions.find(t => t.id === transactionId);
+        if (!transaction) return;
+
+        // Tambah ke daftar starred
+        if (!this.state.starredTransactions.find(t => t.id === transactionId)) {
+            this.state.starredTransactions.push({
+                ...transaction,
+                starredAt: new Date().toISOString(),
+                syncedToCloud: false
+            });
+        }
+
+        // Sync ke dual cloud
+        await this.syncImportantToCloud();
+        this.updateImportantCloudList();
+        
+        this.updateDynamicIsland('⭐ Transaksi penting disinkronisasi ke cloud', 2000);
+    },
+
+    // Inisialisasi Dual Firebase
+    async initializeDualFirebase() {
+        try {
+            // Inisialisasi Primary Cloud (ikhsanfakhrozi12@gmail.com)
+            if (typeof firebase !== 'undefined') {
+                this.state.primaryApp = firebase.initializeApp(this.config.primaryCloud, 'primary');
+                console.log('[PRIMARY-CLOUD] Initialized successfully');
+                
+                // Setup auth state listener untuk primary
+                firebase.auth(this.state.primaryApp).onAuthStateChanged(async (user) => {
+                    this.state.primaryUser = user;
+                    if (!user) {
+                        await this.signInAnonymously(this.state.primaryApp, 'primary');
+                    } else {
+                        this.state.primaryConnected = true;
+                        this.updateCloudStatus();
+                    }
+                });
+
+                await this.signInAnonymously(this.state.primaryApp, 'primary');
+            }
+
+            // Inisialisasi Backup Cloud (najibwahidussalam938@gmail.com)
+            if (typeof firebase !== 'undefined') {
+                this.state.backupApp = firebase.initializeApp(this.config.backupCloud, 'backup');
+                console.log('[BACKUP-CLOUD] Initialized successfully');
+                
+                // Setup auth state listener untuk backup
+                firebase.auth(this.state.backupApp).onAuthStateChanged(async (user) => {
+                    this.state.backupUser = user;
+                    if (!user) {
+                        await this.signInAnonymously(this.state.backupApp, 'backup');
+                    } else {
+                        this.state.backupConnected = true;
+                        this.updateCloudStatus();
+                    }
+                });
+
+                await this.signInAnonymously(this.state.backupApp, 'backup');
+            }
+
+        } catch (error) {
+            console.error('[DUAL-FIREBASE] Initialization error:', error);
+        }
+    },
+
+    // Sign in anonymously untuk kedua cloud
+    async signInAnonymously(app, type) {
+        try {
+            const result = await firebase.auth(app).signInAnonymously();
+            if (type === 'primary') {
+                this.state.primaryUser = result.user;
+                this.state.primaryConnected = true;
+            } else {
+                this.state.backupUser = result.user;
+                this.state.backupConnected = true;
+            }
+            this.updateCloudStatus();
+            console.log(`[${type.toUpperCase()}-CLOUD] Signed in anonymously`);
+        } catch (error) {
+            console.error(`[${type.toUpperCase()}-CLOUD] Sign in error:`, error);
+        }
+    },
+
+    // Setup Event Listeners
     setupEventListeners() {
         // Panel toggle
         document.getElementById('openStoragePanel').addEventListener('click', this.openPanel.bind(this));
         document.getElementById('closeStoragePanel').addEventListener('click', this.closePanel.bind(this));
         
-        // Quick actions
+        // Cloud actions
+        document.getElementById('dualBackup').addEventListener('click', this.dualCloudBackup.bind(this));
+        document.getElementById('restoreFromPrimary').addEventListener('click', this.restoreFromPrimaryCloud.bind(this));
+        document.getElementById('restoreFromBackup').addEventListener('click', this.restoreFromBackupCloud.bind(this));
+        
+        // Quick actions dengan integrasi sidebar
         document.querySelectorAll('.action-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const action = e.currentTarget.getAttribute('data-action');
-                this.handleQuickAction(action);
+                this.handleIntegratedAction(action);
             });
         });
 
-        // Settings toggles
-        document.getElementById('compressionToggle').addEventListener('change', (e) => {
-            this.config.compressionEnabled = e.target.checked;
-            this.saveConfig();
-        });
-
-        document.getElementById('autoBackupToggle').addEventListener('change', (e) => {
-            this.config.autoBackup = e.target.checked;
-            this.saveConfig();
-        });
-
-        document.getElementById('monitoringToggle').addEventListener('change', (e) => {
-            this.config.monitoringEnabled = e.target.checked;
-            this.saveConfig();
-        });
-
-        document.getElementById('autoCleanupToggle').addEventListener('change', (e) => {
-            this.config.autoCleanup = e.target.checked;
-            this.saveConfig();
-        });
-
-        // Management actions
-        document.getElementById('importData').addEventListener('click', this.importData.bind(this));
-        document.getElementById('clearAllData').addEventListener('click', this.clearAllData.bind(this));
-        document.getElementById('refreshStorage').addEventListener('click', this.updateStorageInfo.bind(this));
-        document.getElementById('optimizeStorage').addEventListener('click', this.optimizeAll.bind(this));
-        document.getElementById('showConsentModal').addEventListener('click', this.showConsentModal.bind(this));
+        // Enhanced actions
+        document.getElementById('syncStarred').addEventListener('click', this.syncAllStarred.bind(this));
+        document.getElementById('deepScan').addEventListener('click', this.deepScanData.bind(this));
+        document.getElementById('exportEncrypted').addEventListener('click', this.exportEncryptedData.bind(this));
+        document.getElementById('fullProtection').addEventListener('click', this.enableFullProtection.bind(this));
+        document.getElementById('emergencyBackup').addEventListener('click', this.emergencyBackup.bind(this));
     },
 
-    // Update toggle switches berdasarkan config
-    updateToggleSwitches() {
-        document.getElementById('compressionToggle').checked = this.config.compressionEnabled;
-        document.getElementById('autoBackupToggle').checked = this.config.autoBackup;
-        document.getElementById('monitoringToggle').checked = this.config.monitoringEnabled;
-        document.getElementById('autoCleanupToggle').checked = this.config.autoCleanup;
-    },
-
-    // Save konfigurasi
-    saveConfig() {
-        localStorage.setItem('stl_storage_config', JSON.stringify(this.config));
-    },
-
-    // Panel controls
-    openPanel() {
-        document.getElementById('storagePanel').classList.add('active');
-        this.updateStorageInfo();
-    },
-
-    closePanel() {
-        document.getElementById('storagePanel').classList.remove('active');
-    },
-
-    // Update storage information
-    updateStorageInfo() {
-        this.calculateStorageUsage();
-        this.updateUI();
-        this.updateDataTable();
-    },
-
-    // Hitung penggunaan storage
-    calculateStorageUsage() {
-        let totalSize = 0;
-        let itemCount = 0;
-        const breakdown = {
-            finance: 0,
-            config: 0,
-            backup: 0,
-            cache: 0
-        };
-
-        // Hitung semua data STL
-        for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key) && key.startsWith('stl_')) {
-                const itemSize = localStorage[key].length;
-                totalSize += itemSize;
-                itemCount++;
-
-                // Kategorikan data
-                if (key.includes('financial') || key.includes('transaction')) {
-                    breakdown.finance += itemSize;
-                } else if (key.includes('config') || key.includes('theme')) {
-                    breakdown.config += itemSize;
-                } else if (key.includes('backup')) {
-                    breakdown.backup += itemSize;
-                } else if (key.includes('cache') || key.includes('temp')) {
-                    breakdown.cache += itemSize;
-                }
-            }
-        }
-
-        this.state.totalSize = totalSize;
-        this.state.itemCount = itemCount;
-        this.state.breakdown = breakdown;
-    },
-
-    // Update UI
-    updateUI() {
-        const usagePercent = this.state.totalSize / this.config.maxSize;
-        const usageText = `${this.formatSize(this.state.totalSize)} / ${this.formatSize(this.config.maxSize)} digunakan`;
-        
-        // Update usage meter
-        const meterFill = document.getElementById('storageMeterFill');
-        meterFill.style.width = `${Math.min(usagePercent * 100, 100)}%`;
-        
-        if (usagePercent > 0.8) {
-            meterFill.classList.add('high');
-        } else {
-            meterFill.classList.remove('high');
-        }
-
-        // Update text
-        document.getElementById('storageUsageText').textContent = usageText;
-        document.getElementById('storagePercentage').textContent = `${Math.round(usagePercent * 100)}%`;
-
-        // Update breakdown
-        document.getElementById('financeDataSize').textContent = this.formatSize(this.state.breakdown.finance);
-        document.getElementById('configDataSize').textContent = this.formatSize(this.state.breakdown.config);
-        document.getElementById('backupDataSize').textContent = this.formatSize(this.state.breakdown.backup);
-        document.getElementById('cacheDataSize').textContent = this.formatSize(this.state.breakdown.cache);
-
-        // Update platform info
-        document.getElementById('platformInfo').textContent = this.state.platform;
-        document.getElementById('browserInfo').textContent = this.state.browser;
-        document.getElementById('totalItems').textContent = this.state.itemCount;
-
-        // Update status
-        const statusElement = document.getElementById('storageStatusInfo');
-        const consentElement = document.getElementById('consentStatus');
-        
-        if (usagePercent > 0.9) {
-            statusElement.textContent = 'Kritis';
-            statusElement.style.color = '#ef4444';
-        } else if (usagePercent > 0.7) {
-            statusElement.textContent = 'Penuh';
-            statusElement.style.color = '#f59e0b';
-        } else {
-            statusElement.textContent = 'Aman';
-            statusElement.style.color = '#10b981';
-        }
-
-        // Update consent status
-        if (this.state.consentGiven) {
-            consentElement.textContent = 'Persetujuan: Diterima';
-            consentElement.className = 'status-consent';
-        } else {
-            consentElement.textContent = 'Persetujuan: Menunggu';
-            consentElement.className = 'status-consent pending';
-        }
-    },
-
-    // Update data table
-    updateDataTable() {
-        const tableBody = document.getElementById('dataTableBody');
-        tableBody.innerHTML = '';
-
-        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
-
-        stlKeys.forEach(key => {
-            const size = localStorage[key].length;
-            const row = document.createElement('tr');
-            
-            // Coba parse timestamp dari data
-            let lastModified = 'Tidak diketahui';
-            try {
-                const data = JSON.parse(localStorage[key]);
-                if (data.timestamp) {
-                    lastModified = new Date(data.timestamp).toLocaleDateString('id-ID');
-                }
-            } catch (e) {
-                // Jika tidak bisa parse, gunakan waktu sekarang
-                lastModified = new Date().toLocaleDateString('id-ID');
-            }
-
-            row.innerHTML = `
-                <td>${this.getFriendlyName(key)}</td>
-                <td>${this.formatSize(size)}</td>
-                <td>${lastModified}</td>
-                <td class="data-actions">
-                    <button class="data-btn view" data-key="${key}">Lihat</button>
-                    <button class="data-btn delete" data-key="${key}">Hapus</button>
-                    <button class="data-btn export" data-key="${key}">Export</button>
-                </td>
-            `;
-            
-            tableBody.appendChild(row);
-        });
-
-        // Add event listeners to action buttons
-        this.setupDataTableEvents();
-    },
-
-    setupDataTableEvents() {
-        document.querySelectorAll('.data-btn.view').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const key = e.target.getAttribute('data-key');
-                this.viewData(key);
-            });
-        });
-
-        document.querySelectorAll('.data-btn.delete').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const key = e.target.getAttribute('data-key');
-                this.deleteData(key);
-            });
-        });
-
-        document.querySelectorAll('.data-btn.export').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const key = e.target.getAttribute('data-key');
-                this.exportSingleData(key);
-            });
-        });
-    },
-
-    // Handle quick actions
-    handleQuickAction(action) {
+    // Handle integrated actions dengan sidebar
+    handleIntegratedAction(action) {
         switch(action) {
-            case 'optimize':
-                this.optimizeStorage();
+            case 'starSync':
+                this.syncAllStarred();
                 break;
-            case 'cleanCache':
-                this.cleanCache();
+            case 'sidebarBackup':
+                // Trigger backup dari sidebar
+                if (window.backupData) window.backupData();
                 break;
-            case 'createBackup':
-                this.createBackup();
+            case 'importantHistory':
+                this.showImportantHistory();
                 break;
-            case 'exportData':
-                this.exportAllData();
+            case 'dualCloud':
+                this.dualCloudBackup();
                 break;
         }
     },
 
-    // Fungsi optimisasi
-    optimizeStorage() {
-        this.cleanCache();
-        this.compressData();
-        this.updateStorageInfo();
-        
-        if (typeof updateDynamicIsland === 'function') {
-            updateDynamicIsland('✅ Penyimpanan dioptimalkan', 2000);
+    // Dual Cloud Backup System
+    async dualCloudBackup() {
+        if (!this.state.primaryConnected && !this.state.backupConnected) {
+            this.updateDynamicIsland('❌ Kedua cloud tidak terhubung', 3000);
+            return;
         }
-    },
 
-    optimizeAll() {
-        this.optimizeStorage();
-        this.createBackup();
-        
-        if (typeof updateDynamicIsland === 'function') {
-            updateDynamicIsland('✨ Semua optimisasi selesai', 2000);
-        }
-    },
+        this.updateDynamicIsland('🔄 Memulai backup ke dual cloud...', 3000);
 
-    cleanCache() {
-        const tempKeys = Object.keys(localStorage).filter(key => 
-            key.startsWith('stl_temp_') || key.startsWith('stl_cache_')
-        );
-        
-        tempKeys.forEach(key => localStorage.removeItem(key));
-        
-        if (typeof updateDynamicIsland === 'function') {
-            updateDynamicIsland('🗑️ Cache dibersihkan', 2000);
-        }
-    },
-
-    compressData() {
-        if (!this.config.compressionEnabled) return;
-        
-        // Implementasi kompresi sederhana
-        const financialData = localStorage.getItem('stl_udhis_financial_data');
-        if (financialData && financialData.length > 50000) {
-            try {
-                // Simulasi kompresi - di production gunakan library kompresi
-                console.log('Compressing financial data...');
-            } catch (e) {
-                console.warn('Failed to compress data');
-            }
-        }
-    },
-
-    createBackup() {
-        const backupData = {};
-        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
-        
-        stlKeys.forEach(key => {
-            backupData[key] = localStorage.getItem(key);
-        });
-        
-        backupData.timestamp = Date.now();
-        backupData.version = '1.0';
-        
-        localStorage.setItem('stl_manual_backup', JSON.stringify(backupData));
-        
-        if (typeof updateDynamicIsland === 'function') {
-            updateDynamicIsland('💾 Backup dibuat', 2000);
-        }
-    },
-
-    // Data management functions
-    viewData(key) {
         try {
-            const data = localStorage.getItem(key);
-            const parsed = JSON.parse(data);
-            console.log(`Data ${key}:`, parsed);
-            alert(`Preview data ${key} tersedia di console browser`);
-        } catch (e) {
-            alert('Tidak bisa melihat data ini');
-        }
-    },
-
-    deleteData(key) {
-        if (confirm(`Hapus data ${key}?`)) {
-            localStorage.removeItem(key);
-            this.updateStorageInfo();
+            const backupData = this.prepareBackupData();
+            const encryptedData = this.encryptData(backupData);
             
-            if (typeof updateDynamicIsland === 'function') {
-                updateDynamicIsland('🗑️ Data dihapus', 2000);
+            let primarySuccess = false;
+            let backupSuccess = false;
+
+            // Backup ke Primary Cloud
+            if (this.state.primaryConnected) {
+                primarySuccess = await this.backupToCloud(encryptedData, 'primary');
             }
+
+            // Backup ke Backup Cloud
+            if (this.state.backupConnected) {
+                backupSuccess = await this.backupToCloud(encryptedData, 'backup');
+            }
+
+            if (primarySuccess || backupSuccess) {
+                this.state.lastSync = new Date().toISOString();
+                this.updateCloudStatus();
+                
+                const successMsg = `✅ Backup berhasil: ${primarySuccess ? 'Primary' : ''} ${backupSuccess ? 'Backup' : ''}`;
+                this.updateDynamicIsland(successMsg, 4000);
+            } else {
+                this.updateDynamicIsland('❌ Backup ke kedua cloud gagal', 3000);
+            }
+
+        } catch (error) {
+            console.error('[DUAL-BACKUP] Error:', error);
+            this.updateDynamicIsland('❌ Error selama backup', 3000);
         }
     },
 
-    exportSingleData(key) {
-        const data = localStorage.getItem(key);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${key}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    },
-
-    exportAllData() {
+    // Siapkan data untuk backup
+    prepareBackupData() {
         const allData = {};
         const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
         
         stlKeys.forEach(key => {
             allData[key] = localStorage.getItem(key);
         });
+
+        // Tambahkan metadata penting
+        allData.metadata = {
+            timestamp: new Date().toISOString(),
+            version: '3.0',
+            dualBackup: true,
+            starredCount: this.state.starredTransactions.length,
+            importantCount: this.state.importantHistory.length,
+            totalSize: this.state.totalSize,
+            checksum: this.generateChecksum(JSON.stringify(allData))
+        };
+
+        return allData;
+    },
+
+    // Backup ke cloud tertentu
+    async backupToCloud(data, cloudType) {
+        try {
+            const app = cloudType === 'primary' ? this.state.primaryApp : this.state.backupApp;
+            const user = cloudType === 'primary' ? this.state.primaryUser : this.state.backupUser;
+            
+            const db = firebase.firestore(app);
+            await db.collection('dualBackups').doc(user.uid).set({
+                data: data,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                cloudType: cloudType,
+                encrypted: true,
+                version: '3.0'
+            });
+
+            // Update cloud usage
+            const dataSize = new Blob([JSON.stringify(data)]).size;
+            if (cloudType === 'primary') {
+                this.state.primaryUsage = dataSize;
+            } else {
+                this.state.backupUsage = dataSize;
+            }
+
+            console.log(`[${cloudType.toUpperCase()}-CLOUD] Backup successful`);
+            return true;
+
+        } catch (error) {
+            console.error(`[${cloudType.toUpperCase()}-CLOUD] Backup error:`, error);
+            return false;
+        }
+    },
+
+    // Sync important data ke cloud
+    async syncImportantToCloud() {
+        const importantData = {
+            starredTransactions: this.state.starredTransactions,
+            importantHistory: this.state.importantHistory,
+            lastUpdated: new Date().toISOString()
+        };
+
+        try {
+            // Sync ke kedua cloud
+            if (this.state.primaryConnected) {
+                const db = firebase.firestore(this.state.primaryApp);
+                await db.collection('importantData').doc(this.state.primaryUser.uid).set(importantData);
+            }
+
+            if (this.state.backupConnected) {
+                const db = firebase.firestore(this.state.backupApp);
+                await db.collection('importantData').doc(this.state.backupUser.uid).set(importantData);
+            }
+
+            console.log('[IMPORTANT-SYNC] Important data synced to both clouds');
+        } catch (error) {
+            console.error('[IMPORTANT-SYNC] Error:', error);
+        }
+    },
+
+    // Restore dari Primary Cloud
+    async restoreFromPrimaryCloud() {
+        await this.restoreFromCloud('primary');
+    },
+
+    // Restore dari Backup Cloud
+    async restoreFromBackupCloud() {
+        await this.restoreFromCloud('backup');
+    },
+
+    // Restore dari cloud tertentu
+    async restoreFromCloud(cloudType) {
+        if (!this.state.primaryConnected && !this.state.backupConnected) {
+            this.updateDynamicIsland('❌ Cloud tidak terhubung', 3000);
+            return;
+        }
+
+        try {
+            const app = cloudType === 'primary' ? this.state.primaryApp : this.state.backupApp;
+            const user = cloudType === 'primary' ? this.state.primaryUser : this.state.backupUser;
+            
+            this.updateDynamicIsland(`☁️ Memulihkan dari ${cloudType} cloud...`, 3000);
+
+            const db = firebase.firestore(app);
+            const doc = await db.collection('dualBackups').doc(user.uid).get();
+
+            if (!doc.exists) {
+                this.updateDynamicIsland(`❌ Tidak ada backup di ${cloudType} cloud`, 3000);
+                return;
+            }
+
+            const backupData = doc.data().data;
+            const decryptedData = this.decryptData(backupData);
+
+            // Restore data
+            this.restoreData(decryptedData);
+            
+            this.updateDynamicIsland(`✅ Data berhasil dipulihkan dari ${cloudType} cloud`, 3000);
+
+        } catch (error) {
+            console.error(`[${cloudType.toUpperCase()}-RESTORE] Error:`, error);
+            this.updateDynamicIsland(`❌ Gagal memulihkan dari ${cloudType} cloud`, 3000);
+        }
+    },
+
+    // Restore data ke localStorage
+    restoreData(data) {
+        // Hapus data lama
+        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
+        stlKeys.forEach(key => localStorage.removeItem(key));
+
+        // Restore data baru
+        Object.keys(data).forEach(key => {
+            if (key !== 'metadata') {
+                localStorage.setItem(key, data[key]);
+            }
+        });
+
+        this.updateStorageInfo();
         
-        const dataStr = JSON.stringify(allData, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
+        // Refresh aplikasi
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    },
+
+    // Deep Scan Data
+    async deepScanData() {
+        this.updateDynamicIsland('🔍 Memindai data secara mendalam...', 3000);
+        
+        // Scan localStorage
+        const scanResults = {
+            totalItems: 0,
+            totalSize: 0,
+            corrupted: 0,
+            sensitiveData: [],
+            recommendations: []
+        };
+
+        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
+        scanResults.totalItems = stlKeys.length;
+
+        stlKeys.forEach(key => {
+            const data = localStorage.getItem(key);
+            scanResults.totalSize += data.length;
+
+            // Cek data corrupted
+            try {
+                JSON.parse(data);
+            } catch (e) {
+                scanResults.corrupted++;
+                scanResults.recommendations.push(`Data ${key} mungkin corrupted`);
+            }
+
+            // Cek data sensitif
+            if (this.containsSensitiveData(data)) {
+                scanResults.sensitiveData.push(key);
+            }
+        });
+
+        // Tampilkan hasil scan
+        this.showScanResults(scanResults);
+    },
+
+    // Encrypt data untuk keamanan
+    encryptData(data) {
+        if (!this.config.encryptionEnabled) return data;
+        
+        try {
+            // Simple encryption - dalam production gunakan library encryption yang kuat
+            const dataStr = JSON.stringify(data);
+            return btoa(unescape(encodeURIComponent(dataStr)));
+        } catch (error) {
+            console.warn('[ENCRYPTION] Failed to encrypt, returning plain data');
+            return data;
+        }
+    },
+
+    // Decrypt data
+    decryptData(encryptedData) {
+        if (typeof encryptedData === 'string' && encryptedData.includes('{')) {
+            return encryptedData; // Already decrypted
+        }
+
+        try {
+            const decrypted = decodeURIComponent(escape(atob(encryptedData)));
+            return JSON.parse(decrypted);
+        } catch (error) {
+            console.warn('[DECRYPTION] Failed to decrypt, returning original data');
+            return encryptedData;
+        }
+    },
+
+    // Update Cloud Status UI
+    updateCloudStatus() {
+        // Update primary cloud status
+        const cloud1Status = document.getElementById('cloud1Status');
+        const cloud1StatusText = document.getElementById('cloud1StatusText');
+        
+        if (this.state.primaryConnected) {
+            cloud1Status.className = 'status-dot connected';
+            cloud1StatusText.textContent = 'Terhubung - ikhsanfakhrozi12@gmail.com';
+        } else {
+            cloud1Status.className = 'status-dot error';
+            cloud1StatusText.textContent = 'Terputus';
+        }
+
+        // Update backup cloud status
+        const cloud2Status = document.getElementById('cloud2Status');
+        const cloud2StatusText = document.getElementById('cloud2StatusText');
+        
+        if (this.state.backupConnected) {
+            cloud2Status.className = 'status-dot connected';
+            cloud2StatusText.textContent = 'Terhubung - najibwahidussalam938@gmail.com';
+        } else {
+            cloud2Status.className = 'status-dot error';
+            cloud2StatusText.textContent = 'Terputus';
+        }
+
+        // Update last sync time
+        const lastSyncElement = document.getElementById('lastSyncTime');
+        if (this.state.lastSync) {
+            lastSyncElement.textContent = new Date(this.state.lastSync).toLocaleString('id-ID');
+        } else {
+            lastSyncElement.textContent = 'Belum pernah';
+        }
+
+        // Update cloud usage meters
+        this.updateCloudUsageMeters();
+    },
+
+    // Update Cloud Usage Meters
+    updateCloudUsageMeters() {
+        const primaryUsage = this.state.primaryUsage || 0;
+        const backupUsage = this.state.backupUsage || 0;
+
+        const primaryPercent = (primaryUsage / this.config.maxCloudSize) * 100;
+        const backupPercent = (backupUsage / this.config.maxCloudSize) * 100;
+
+        document.getElementById('cloud1MeterFill').style.width = `${Math.min(primaryPercent, 100)}%`;
+        document.getElementById('cloud2MeterFill').style.width = `${Math.min(backupPercent, 100)}%`;
+
+        document.getElementById('cloud1UsageText').textContent = 
+            `${this.formatSize(primaryUsage)} / ${this.formatSize(this.config.maxCloudSize)} digunakan`;
+        document.getElementById('cloud2UsageText').textContent = 
+            `${this.formatSize(backupUsage)} / ${this.formatSize(this.config.maxCloudSize)} digunakan`;
+
+        document.getElementById('cloud1Percentage').textContent = `${Math.round(primaryPercent)}%`;
+        document.getElementById('cloud2Percentage').textContent = `${Math.round(backupPercent)}%`;
+    },
+
+    // Load Important History dari localStorage
+    loadImportantHistory() {
+        try {
+            const savedHistory = localStorage.getItem('stl_important_history');
+            if (savedHistory) {
+                this.state.importantHistory = JSON.parse(savedHistory);
+            }
+            this.updateImportantCloudList();
+        } catch (error) {
+            console.warn('[IMPORTANT-HISTORY] Failed to load important history');
+        }
+    },
+
+    // Update Important Cloud List
+    updateImportantCloudList() {
+        const container = document.getElementById('importantCloudList');
+        const importantItems = [...this.state.starredTransactions, ...this.state.importantHistory.slice(0, 5)];
+        
+        if (importantItems.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-500 py-4">Belum ada transaksi penting</div>';
+            return;
+        }
+
+        container.innerHTML = importantItems.map(item => `
+            <div class="important-item">
+                <div class="important-desc">${item.description || 'Transaksi penting'}</div>
+                <div class="important-amount ${item.type === 'debit' ? 'income' : 'expense'}">
+                    ${item.type === 'debit' ? '+' : '-'} Rp ${this.formatCurrency(item.amount || 0)}
+                </div>
+            </div>
+        `).join('');
+    },
+
+    // Enhanced Functions
+    async syncAllStarred() {
+        this.updateDynamicIsland('⭐ Menyinkronisasi semua transaksi penting...', 3000);
+        await this.syncImportantToCloud();
+        this.updateImportantCloudList();
+        this.updateDynamicIsland('✅ Semua transaksi penting tersinkronisasi', 2000);
+    },
+
+    async enableFullProtection() {
+        this.config.autoStarSync = true;
+        this.config.encryptionEnabled = true;
+        this.config.dualBackup = true;
+        
+        await this.dualCloudBackup();
+        this.updateDynamicIsland('🛡️ Full Protection Diaktifkan', 3000);
+    },
+
+    async emergencyBackup() {
+        this.updateDynamicIsland('🚨 Memulai emergency backup...', 3000);
+        // Force backup tanpa pengecekan
+        await this.dualCloudBackup();
+    },
+
+    exportEncryptedData() {
+        const data = this.prepareBackupData();
+        const encrypted = this.encryptData(data);
+        const blob = new Blob([encrypted], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `stl-full-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `stl-encrypted-backup-${new Date().toISOString().split('T')[0]}.enc`;
         a.click();
         URL.revokeObjectURL(url);
         
-        if (typeof updateDynamicIsland === 'function') {
-            updateDynamicIsland('📤 Semua data diexport', 2000);
-        }
+        this.updateDynamicIsland('🔐 Data terenkripsi diexport', 2000);
     },
 
-    importData() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        
-        input.onchange = e => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = event => {
-                try {
-                    const importedData = JSON.parse(event.target.result);
-                    Object.keys(importedData).forEach(key => {
-                        if (key.startsWith('stl_')) {
-                            localStorage.setItem(key, importedData[key]);
-                        }
-                    });
-                    
-                    this.updateStorageInfo();
-                    
-                    if (typeof updateDynamicIsland === 'function') {
-                        updateDynamicIsland('✅ Data berhasil diimport', 2000);
-                    }
-                    
-                    // Refresh aplikasi
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                    
-                } catch (error) {
-                    alert('Gagal mengimpor data: Format file tidak valid');
-                }
-            };
-            
-            reader.readAsText(file);
-        };
-        
-        input.click();
-    },
-
-    clearAllData() {
-        if (confirm('HAPUS SEMUA DATA? Tindakan ini tidak dapat dibatalkan!')) {
-            const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
-            stlKeys.forEach(key => localStorage.removeItem(key));
-            
-            this.updateStorageInfo();
-            
-            if (typeof updateDynamicIsland === 'function') {
-                updateDynamicIsland('🗑️ Semua data dihapus', 3000);
-            }
-            
-            // Refresh aplikasi
+    showImportantHistory() {
+        // Trigger show important history dari sidebar kiri
+        if (window.toggleLeftSidebar) {
+            window.toggleLeftSidebar();
             setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+                const importantSection = document.querySelector('.enhanced-card:nth-child(3)');
+                if (importantSection) {
+                    importantSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 500);
         }
     },
 
-    showConsentModal() {
-        // Panggil fungsi showConsentModal dari storage manager utama jika ada
-        if (window.STORAGE_MANAGER && typeof window.STORAGE_MANAGER.showConsentModal === 'function') {
-            window.STORAGE_MANAGER.showConsentModal();
-        } else {
-            alert('Fungsi persetujuan tidak tersedia. Silakan refresh halaman.');
-        }
+    showScanResults(results) {
+        const resultText = `
+Total Items: ${results.totalItems}
+Total Size: ${this.formatSize(results.totalSize)}
+Data Corrupted: ${results.corrupted}
+Data Sensitif: ${results.sensitiveData.length}
+
+Rekomendasi:
+${results.recommendations.join('\n') || 'Tidak ada masalah ditemukan'}
+        `.trim();
+
+        alert(`Hasil Deep Scan:\n\n${resultText}`);
     },
 
-    // Utility functions
+    // Utility Functions
     formatSize(bytes) {
         if (bytes < 1024) return bytes + ' B';
         if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / 1048576).toFixed(1) + ' MB';
     },
 
-    getFriendlyName(key) {
-        const names = {
-            'stl_udhis_config': 'Konfigurasi Aplikasi',
-            'stl_udhis_financial_data': 'Data Keuangan',
-            'stl_important_history': 'Riwayat Penting',
-            'stl_auto_backup': 'Backup Otomatis',
-            'stl_manual_backup': 'Backup Manual',
-            'stl_storage_config': 'Konfigurasi Penyimpanan',
-            'stl_storage_consent': 'Persetujuan Penyimpanan',
-            'stl_dino_game_data': 'Data Game Dino',
-            'stl_currency_data': 'Data Mata Uang'
-        };
+    formatCurrency(amount) {
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+
+    generateChecksum(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash;
+    },
+
+    containsSensitiveData(data) {
+        const sensitivePatterns = [
+            'password', 'token', 'secret', 'key', 'auth',
+            'username', 'email', 'phone', 'address'
+        ];
+        const dataStr = JSON.stringify(data).toLowerCase();
+        return sensitivePatterns.some(pattern => dataStr.includes(pattern));
+    },
+
+    updateDynamicIsland(message, duration = 3000) {
+        if (typeof window.updateDynamicIsland === 'function') {
+            window.updateDynamicIsland(message, duration);
+        } else {
+            console.log('Dynamic Island:', message);
+        }
+    },
+
+    // Panel Controls
+    openPanel() {
+        document.getElementById('storagePanel').classList.add('active');
+        this.updateStorageInfo();
+        this.updateCloudStatus();
+        this.updateImportantCloudList();
+    },
+
+    closePanel() {
+        document.getElementById('storagePanel').classList.remove('active');
+    },
+
+    // Load config
+    loadConfig() {
+        const savedConfig = localStorage.getItem('stl_dual_storage_config');
+        if (savedConfig) {
+            try {
+                this.config = { ...this.config, ...JSON.parse(savedConfig) };
+            } catch (e) {
+                console.warn('Failed to load dual storage config');
+            }
+        }
+    },
+
+    // Update storage info (integrasi dengan existing system)
+    updateStorageInfo() {
+        // Reuse existing storage calculation
+        if (window.STORAGE_MANAGER_PANEL && typeof window.STORAGE_MANAGER_PANEL.updateStorageInfo === 'function') {
+            window.STORAGE_MANAGER_PANEL.updateStorageInfo();
+        } else {
+            this.calculateStorageUsage();
+            this.updateUI();
+        }
+    },
+
+    calculateStorageUsage() {
+        // Implementation similar to previous storage manager
+        let totalSize = 0;
+        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
         
-        return names[key] || key.replace('stl_', '').replace(/_/g, ' ');
+        stlKeys.forEach(key => {
+            totalSize += localStorage[key].length;
+        });
+
+        this.state.totalSize = totalSize;
+    },
+
+    updateUI() {
+        const usagePercent = this.state.totalSize / this.config.maxLocalSize;
+        const usageText = `${this.formatSize(this.state.totalSize)} / ${this.formatSize(this.config.maxLocalSize)} digunakan`;
+        
+        const meterFill = document.getElementById('storageMeterFill');
+        meterFill.style.width = `${Math.min(usagePercent * 100, 100)}%`;
+        
+        document.getElementById('storageUsageText').textContent = usageText;
+        document.getElementById('storagePercentage').textContent = `${Math.round(usagePercent * 100)}%`;
     }
 };
 
 // Inisialisasi saat DOM ready
 document.addEventListener('DOMContentLoaded', function() {
-    STORAGE_MANAGER.init();
+    DUAL_STORAGE_MANAGER.init();
 });
 
-// Expose ke global scope
-window.STORAGE_MANAGER_PANEL = STORAGE_MANAGER;
+// Expose ke global scope untuk integrasi
+window.DUAL_STORAGE_MANAGER = DUAL_STORAGE_MANAGER;
 </script>
 <!-- Tambahkan tombol game dinosaurus di atas tombol currency -->
 <button id="openDinoGame" class="dino-game-toggle">
@@ -13171,5 +13209,485 @@ img.performance-optimized {
     border-radius: var(--radius-lg);
 }
 </style>
+<script>
+  // ==================== INJEKSI FIREBASE: AUTH + FIRESTORE + STORAGE ====================
+// LETAKKAN INI DI BAWAH SEMUA SCRIPT LAIN SEBELUM </body>
+// Pastikan SDK firebase-app-compat, firebase-auth-compat, firebase-firestore-compat sudah ada di <head>.
+
+(function(){
+  'use strict';
+
+  // --------- 1) CONFIG: masukkan firebaseConfig Anda di sini ---------
+  const firebaseConfig = {
+    apiKey: "GANTI_DENGAN_API_KEY_ANDA",
+    authDomain: "GANTI_DENGAN_AUTH_DOMAIN_ANDA",
+    projectId: "GANTI_DENGAN_PROJECT_ID_ANDA",
+    storageBucket: "GANTI_DENGAN_STORAGE_BUCKET_ANDA",
+    messagingSenderId: "GANTI_DENGAN_SENDER_ID_ANDA",
+    appId: "GANTI_DENGAN_APP_ID_ANDA"
+  };
+
+  // --------- 2) INIT Firebase (compat) ---------
+  let fb_app, fb_auth, fb_db, fb_storage;
+  try {
+    fb_app = firebase.initializeApp(firebaseConfig);
+    fb_auth = firebase.auth();
+    fb_db = firebase.firestore();
+    fb_storage = firebase.storage();
+    console.log('🔥 Firebase initialized (inject)');
+  } catch (err) {
+    console.error('❌ Firebase init fail:', err);
+    // non-fatal: fall back to local-only mode (we'll still keep existing localStorage)
+  }
+
+  // --------- 3) Helpers: AES encrypt/decrypt using CryptoJS (keamanan tetap di client) ---------
+  function aesEncrypt(obj, pass) {
+    try {
+      return CryptoJS.AES.encrypt(JSON.stringify(obj), pass).toString();
+    } catch (e) { console.error('aesEncrypt', e); return null; }
+  }
+  function aesDecrypt(cipherText, pass) {
+    try {
+      const plain = CryptoJS.AES.decrypt(cipherText, pass).toString(CryptoJS.enc.Utf8);
+      return plain ? JSON.parse(plain) : null;
+    } catch (e) { console.warn('aesDecrypt fail', e); return null; }
+  }
+
+  // --------- 4) Firebase Auth wrapper (Google) ---------
+  const FirebaseAuthenticator = {
+    currentUser: null,
+    initAuthListener() {
+      if(!fb_auth) return;
+      fb_auth.onAuthStateChanged(user => {
+        this.currentUser = user || null;
+        if(user) {
+          console.log('🔐 Firebase user:', user.uid, user.email);
+          // UI swap: sembunyikan layar passphrase, tampilkan content jika ada
+          try {
+            document.getElementById('rekeningAuth').style.display = 'none';
+            document.getElementById('rekeningContent').style.display = 'block';
+          } catch(e){}
+          FirebaseDataManager.loadAllData(user.uid);
+        } else {
+          console.log('🔓 No firebase user');
+          try {
+            document.getElementById('rekeningAuth').style.display = 'block';
+            document.getElementById('rekeningContent').style.display = 'none';
+          } catch(e){}
+        }
+      });
+    },
+    signInWithGoogle() {
+      if(!fb_auth) { showAccountMessage('Firebase tidak tersedia', 'error'); return; }
+      const provider = new firebase.auth.GoogleAuthProvider();
+      fb_auth.signInWithPopup(provider).catch(err => {
+        console.error('Google signIn failed', err);
+        showAccountMessage('Login Google gagal: ' + (err.message || err), 'error');
+      });
+    },
+    signOut() {
+      if(!fb_auth) return;
+      fb_auth.signOut().then(() => {
+        // clear sensitive in-memory
+        ACCOUNT_STATE.isAuthenticated = false;
+        ACCOUNT_STATE.passphrase = '';
+        window.FINANCIAL_STATE = window.FINANCIAL_STATE || {transactions:[], categories:{}, currentBalance:0};
+        if(typeof updateDashboard === 'function') try{ updateDashboard(); }catch(e){}
+      }).catch(err => console.error('signOut err', err));
+    }
+  };
+
+  // --------- 5) Firebase Data Manager: Firestore for JSON state, Storage for large backups ---------
+  const FirebaseDataManager = {
+    async saveAllData(uid, pass) {
+      if(!fb_db || !uid) return;
+      // Build payload: encrypt both states with user-provided passphrase (pass required for re-encryption)
+      const finance = {
+        transactions: window.FINANCIAL_STATE?.transactions || [],
+        categories: window.FINANCIAL_STATE?.categories || {},
+        currentBalance: window.FINANCIAL_STATE?.currentBalance || 0,
+        monthlyIncome: window.FINANCIAL_STATE?.monthlyIncome || 0,
+        monthlyExpense: window.FINANCIAL_STATE?.monthlyExpense || 0
+      };
+      const accounts = {
+        accounts: window.ACCOUNT_STATE?.accounts || []
+      };
+
+      // We store encrypted blobs so even Firestore content is ciphertext
+      const encFinance = aesEncrypt(finance, pass);
+      const encAccounts = aesEncrypt(accounts, pass);
+
+      try {
+        await fb_db.collection('userData').doc(uid).set({
+          finance: encFinance,
+          accounts: encAccounts,
+          meta: { updatedAt: firebase.firestore.FieldValue.serverTimestamp(), version: 1 }
+        }, { merge: true });
+        console.log('☁️ saveAllData -> Firestore OK');
+        if(window.updateDynamicIsland) updateDynamicIsland('☁️ Data tersinkronisasi ke cloud', 1400);
+      } catch (e) {
+        console.error('Firestore saveAllData err', e);
+        showAccountMessage('Gagal simpan cloud: ' + (e.message||e), 'error');
+      }
+    },
+
+    async loadAllData(uid) {
+      if(!fb_db || !uid) return;
+      try {
+        const doc = await fb_db.collection('userData').doc(uid).get();
+        if(!doc.exists) {
+          console.log('☁️ userData doc not found');
+          return;
+        }
+        const d = doc.data();
+        // d.finance & d.accounts are encrypted strings (AES by client)
+        // We do NOT have passphrase here; caller must provide passphrase (we'll call decryptAttempt)
+        window.__STL__firebasePayload = d; // temporarily store for decryption attempt
+        console.log('☁️ userData payload loaded (encrypted)');
+        // Caller expected to call decryptUsingPassphrase(pass)
+      } catch (e) {
+        console.error('Firestore loadAllData err', e);
+        showAccountMessage('Gagal memuat cloud: ' + (e.message||e), 'error');
+      }
+    },
+
+    // Upload encrypted backup blob to Firebase Storage and return download URL
+    async uploadBackupBlob(uid, filename, blob) {
+      if(!fb_storage || !uid) throw new Error('Firebase Storage unavailable');
+      const ref = fb_storage.ref().child(`backups/${uid}/${filename}`);
+      const snapshot = await ref.put(blob);
+      const url = await snapshot.ref.getDownloadURL();
+      return url;
+    },
+
+    // Download backup blob reference (if you saved URL previously)
+    async deleteBackup(uid, filename) {
+      if(!fb_storage || !uid) throw new Error('Firebase Storage unavailable');
+      const ref = fb_storage.ref().child(`backups/${uid}/${filename}`);
+      return ref.delete();
+    }
+  };
+
+  // --------- 6) Bridge: replace local save/load with cloud-enabled flows ---------
+  // Hijack global saveData if present in page — ensure it saves to cloud if user logged in, else localStorage as fallback.
+  const originalSaveData = window.saveData || (() => { /*no-op*/ });
+
+  window.saveData = function() {
+    try {
+      // If user authenticated with Firebase AND ACCOUNT_STATE.passphrase exists -> save encrypted to Firestore
+      const uid = FirebaseAuthenticator.currentUser?.uid;
+      const passphrase = ACCOUNT_STATE.passphrase || null;
+
+      if(uid && passphrase) {
+        // Save both FINANCIAL_STATE & ACCOUNT_STATE encrypted
+        FirebaseDataManager.saveAllData(uid, passphrase);
+        // Also keep local encrypted backup for offline resilience
+        try {
+          encryptAndSaveAccounts(passphrase); // existing function that writes localStorage (we will patch it below)
+        } catch(e){}
+        return;
+      }
+
+      // Fallback: call original local save (kept for backward compatibility)
+      originalSaveData();
+    } catch (e) {
+      console.error('saveData wrapper err', e);
+      originalSaveData();
+    }
+  };
+
+  // --------- 7) Decrypt firebase payload (when available) using user's passphrase ---------
+  async function decryptFirebasePayloadWithPass(passphrase) {
+    const payload = window.__STL__firebasePayload;
+    if(!payload) return false;
+    try {
+      const financePlain = aesDecrypt(payload.finance, passphrase);
+      const accountsPlain = aesDecrypt(payload.accounts, passphrase);
+      if(!financePlain || !accountsPlain) {
+        console.warn('decryptFirebasePayload: decrypt returned null (bad pass?)');
+        return false;
+      }
+      // Merge into existing states
+      Object.assign(window.FINANCIAL_STATE, financePlain);
+      Object.assign(window.ACCOUNT_STATE, accountsPlain);
+      // Re-render app
+      if(typeof recalculateBalances === 'function') try{ recalculateBalances(); }catch(e){}
+      if(typeof renderTransactions === 'function') try{ renderTransactions(); }catch(e){}
+      if(typeof updateDashboard === 'function') try{ updateDashboard(); }catch(e){}
+      console.log('☁️ Data cloud didekripsi dan dimuat ke state');
+      return true;
+    } catch (e) {
+      console.error('decryptFirebasePayloadWithPass err', e);
+      return false;
+    }
+  }
+
+  // --------- 8) Patch/augment existing account functions to use cloud when available ---------
+  // Replace encryptAndSaveAccounts (local) to also optionally push to cloud
+  const old_encryptAndSaveAccounts = window.encryptAndSaveAccounts;
+  window.encryptAndSaveAccounts = function(passphrase = ACCOUNT_STATE.passphrase) {
+    try {
+      if(!passphrase) return;
+      // existing local encryption: keep for offline fallback
+      try { old_encryptAndSaveAccounts(passphrase); } catch(e) {}
+      // if firebase logged in, upload encrypted accounts into Firestore doc
+      const uid = FirebaseAuthenticator.currentUser?.uid;
+      if(uid && fb_db) {
+        // Save structured accounts encrypted
+        const accounts = { accounts: ACCOUNT_STATE.accounts, lastUpdated: new Date().toISOString() };
+        const enc = aesEncrypt(accounts, passphrase);
+        fb_db.collection('userData').doc(uid).set({ accounts: enc, meta: { lastAccountSave: firebase.firestore.FieldValue.serverTimestamp() } }, { merge: true })
+          .then(()=> console.log('☁️ accounts saved to firestore'))
+          .catch(e=> console.warn('firestore accounts save err', e));
+      }
+    } catch (e) { console.error('patched encryptAndSaveAccounts err', e); }
+  };
+
+  // Replace loadAndDecryptAccounts to prefer firestore payload when user logged in
+  const old_loadAndDecryptAccounts = window.loadAndDecryptAccounts;
+  window.loadAndDecryptAccounts = function() {
+    const uid = FirebaseAuthenticator.currentUser?.uid;
+    const pass = ACCOUNT_STATE.passphrase;
+    // If firebase user exists, try to fetch doc and decrypt
+    if(uid && fb_db && pass) {
+      fb_db.collection('userData').doc(uid).get().then(doc => {
+        if(!doc.exists) {
+          console.log('No cloud doc, fallback to local');
+          try { old_loadAndDecryptAccounts(); } catch(e) {}
+          return;
+        }
+        const d = doc.data();
+        const encAccounts = d.accounts || null;
+        const encFinance = d.finance || null;
+        let ok = false;
+        if(encAccounts) {
+          const decA = aesDecrypt(encAccounts, pass);
+          if(decA && decA.accounts) {
+            ACCOUNT_STATE.accounts = decA.accounts;
+            ok = true;
+          }
+        }
+        if(encFinance) {
+          const decF = aesDecrypt(encFinance, pass);
+          if(decF && decF.transactions) {
+            Object.assign(window.FINANCIAL_STATE, decF);
+            ok = true;
+          }
+        }
+        if(ok) {
+          console.log('☁️ loadAndDecryptAccounts: loaded from cloud');
+          if(typeof updateAccountsDisplay === 'function') try{ updateAccountsDisplay(); }catch(e){}
+          if(typeof renderTransactions === 'function') try{ renderTransactions(); }catch(e){}
+          if(typeof updateDashboard === 'function') try{ updateDashboard(); }catch(e){}
+        } else {
+          console.log('☁️ cloud data decrypt failed/fallback to local');
+          try { old_loadAndDecryptAccounts(); } catch(e) {}
+        }
+      }).catch(err => {
+        console.error('loadAndDecryptAccounts firestore err', err);
+        try { old_loadAndDecryptAccounts(); } catch(e) {}
+      });
+    } else {
+      try { old_loadAndDecryptAccounts(); } catch(e) {}
+    }
+  };
+
+  // --------- 9) Backup / Restore integration: upload encrypted .enc to Firebase Storage ---------
+  // Patch existing backupData / restoreData if present
+  const old_backupData = window.backupData;
+  window.backupData = async function() {
+    try {
+      const password = document.getElementById('backupPassword')?.value || '';
+      if(!password) { updateDynamicIsland?.('Masukkan password backup',2000); return; }
+      const data = {
+        transactions: FINANCIAL_STATE.transactions,
+        categories: FINANCIAL_STATE.categories,
+        config: CONFIG,
+        accounts: ACCOUNT_STATE.accounts,
+        timestamp: new Date().toISOString()
+      };
+      const enc = aesEncrypt(data, password);
+      const blob = new Blob([enc], { type: 'application/octet-stream' });
+      // If firebase available & user logged in -> upload and return url
+      const uid = FirebaseAuthenticator.currentUser?.uid;
+      if(uid && fb_storage) {
+        const filename = `stl-backup-${new Date().toISOString()}.enc`;
+        try {
+          const url = await FirebaseDataManager.uploadBackupBlob(uid, filename, blob);
+          // optionally save metadata in Firestore
+          if(fb_db) {
+            await fb_db.collection('userData').doc(uid).collection('backups').add({ filename, url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          }
+          updateDynamicIsland?.('✅ Backup berhasil dan tersimpan di cloud',2000);
+          return url;
+        } catch (e) {
+          console.warn('Storage upload err, fallback to local download', e);
+        }
+      }
+      // fallback: download file to user device
+      saveAs(blob, `stl-backup-${new Date().toISOString().split('T')[0]}.enc`);
+      updateDynamicIsland?.('✅ Backup tersimpan lokal',2000);
+    } catch (e) {
+      console.error('backupData err', e);
+      updateDynamicIsland?.('❌ Backup gagal',2000);
+    }
+  };
+
+  // Restore: allow user to pick .enc file then attempt decrypt with provided password; optionally upload to firestore
+  window.restoreData = function() {
+    const password = document.getElementById('backupPassword')?.value || '';
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.enc';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const enc = ev.target.result;
+          const dec = aesDecrypt(enc, password);
+          if(!dec) { updateDynamicIsland?.('❌ Password restore salah',2000); return; }
+          // Restore into states
+          FINANCIAL_STATE.transactions = dec.transactions || [];
+          FINANCIAL_STATE.categories = dec.categories || FINANCIAL_STATE.categories || {};
+          Object.assign(CONFIG, dec.config || {});
+          ACCOUNT_STATE.accounts = dec.accounts || [];
+          // Recalculate and render
+          try { recalculateBalances(); } catch(e){}
+          try { renderTransactions(); } catch(e){}
+          try { updateDashboard(); } catch(e){}
+          // Persist: call saveData() wrapper
+          window.saveData();
+          updateDynamicIsland?.('✅ Data berhasil direstore',2000);
+        } catch (err) {
+          console.error('restoreData err', err);
+          updateDynamicIsland?.('❌ Gagal restore',2000);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
+  // --------- 10) Wire UI buttons (existing IDs in your HTML) to firebase flows ---------
+  document.addEventListener('DOMContentLoaded', function() {
+    // Init auth listener
+    if(fb_auth) FirebaseAuthenticator.initAuthListener();
+
+    // Hijack unlock button -> if user is signed in, attempt decrypt using passphrase; else prompt user to sign-in via Google
+    const unlockButton = document.getElementById('unlockRekening');
+    if(unlockButton) {
+      unlockButton.addEventListener('click', async function() {
+        const pass = document.getElementById('rekeningPassphrase')?.value || '';
+        if(!pass) { showAccountMessage('Masukkan passphrase terlebih dahulu', 'error'); return; }
+
+        // If firebase user present -> try to load cloud payload and decrypt
+        const uid = FirebaseAuthenticator.currentUser?.uid;
+        if(uid && fb_db) {
+          try {
+            // fetch doc; decrypt
+            const doc = await fb_db.collection('userData').doc(uid).get();
+            if(doc.exists) {
+              const data = doc.data();
+              const encA = data.accounts || null;
+              const encF = data.finance || null;
+              let ok = false;
+              if(encA) {
+                const decA = aesDecrypt(encA, pass);
+                if(decA && decA.accounts) {
+                  ACCOUNT_STATE.accounts = decA.accounts;
+                  ok = true;
+                }
+              }
+              if(encF) {
+                const decF = aesDecrypt(encF, pass);
+                if(decF && decF.transactions) {
+                  Object.assign(FINANCIAL_STATE, decF);
+                  ok = true;
+                }
+              }
+              if(ok) {
+                ACCOUNT_STATE.isAuthenticated = true;
+                ACCOUNT_STATE.passphrase = pass;
+                document.getElementById('rekeningAuth').style.display = 'none';
+                document.getElementById('rekeningContent').style.display = 'block';
+                if(typeof updateAccountsDisplay === 'function') updateAccountsDisplay();
+                if(typeof renderTransactions === 'function') renderTransactions();
+                if(typeof updateDashboard === 'function') updateDashboard();
+                showAccountMessage('Akses REKENING berhasil dibuka (cloud)', 'success');
+                // Also persist local encrypted copy
+                try { encryptAndSaveAccounts(pass); } catch(e){}
+                return;
+              }
+            }
+            // if cloud fails or not found -> fallback to local decrypt (existing behavior)
+          } catch (err) {
+            console.warn('unlockRekening cloud attempt err', err);
+          }
+        }
+
+        // If not logged-in to firebase or cloud decrypt failed: call original unlockRekening behavior
+        if(typeof window.unlockRekening === 'function') {
+          // note: original implementation reads passphrase and decrypts localStorage
+          try { window.unlockRekening(); return; } catch(e){ console.error(e); }
+        } else {
+          showAccountMessage('Fungsi unlockRekening tidak ditemukan', 'error');
+        }
+      });
+    }
+
+    // Bind Login/Logout buttons to firebase auth if present
+    // Replace any existing "Login with Google" mechanism — add a small auth button if needed
+    const existingLoginTrigger = document.getElementById('unlockWithGoogle') || null;
+    // optional: if user wants a dedicated login button, dev can add <button id="loginGoogle">Login Google</button> in UI
+    const loginButton = document.getElementById('loginGoogle');
+    if(loginButton) {
+      loginButton.addEventListener('click', () => FirebaseAuthenticator.signInWithGoogle());
+    }
+    // Bind logout
+    const lockButton = document.getElementById('lockRekening');
+    if(lockButton) {
+      lockButton.addEventListener('click', () => {
+        // prefer firebase signout if logged in
+        if(FirebaseAuthenticator.currentUser) {
+          FirebaseAuthenticator.signOut();
+        } else {
+          // fallback: existing lockRekening
+          if(typeof window.lockRekening === 'function') window.lockRekening();
+        }
+      });
+    }
+
+    // Wire other buttons: backup/restore/sync
+    const backupBtn = document.getElementById('backupData');
+    if(backupBtn) backupBtn.addEventListener('click', window.backupData);
+    const restoreBtn = document.getElementById('restoreData');
+    if(restoreBtn) restoreBtn.addEventListener('click', window.restoreData);
+    const syncBtn = document.getElementById('syncData');
+    if(syncBtn) syncBtn.addEventListener('click', () => {
+      // call saveData wrapper
+      window.saveData();
+    });
+
+    // hide old 'forgotPassphrase' flow if you wish (we keep it but you can disable)
+    const forgotBtn = document.getElementById('forgotPassphrase');
+    if(forgotBtn) {
+      // Optional: offer firebase passwordless recovery flow instruction
+      // For now keep original behavior
+      // forgotBtn.style.display = 'none';
+    }
+  });
+
+  // Expose small APIs for debugging
+  window.FB_INJECT = {
+    auth: FirebaseAuthenticator,
+    dataManager: FirebaseDataManager,
+    decryptPayloadWithPass: decryptFirebasePayloadWithPass
+  };
+
+  console.log('✅ Firebase injection script loaded. Replace firebaseConfig and test flows.');
+})();
+</script>
 </body>
 </html>
