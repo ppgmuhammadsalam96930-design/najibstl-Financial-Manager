@@ -3855,103 +3855,193 @@
         messageElement.className = 'game-message';
     }
 </script>
-<!-- Tambahkan di akhir body, sebelum penutup tag body -->
-<button id="openCurrencyPanel" class="currency-panel-toggle">
-    <i class="fas fa-exchange-alt"></i>
+<!-- ==================== STORAGE MANAGEMENT PANEL ==================== -->
+<button id="openStoragePanel" class="storage-panel-toggle">
+    <i class="fas fa-database"></i>
 </button>
 
-<div id="currencyPanel" class="currency-panel">
-    <div class="currency-header">
-        <h3><i class="fas fa-globe-americas"></i> Konversi Mata Uang</h3>
-        <button id="closeCurrencyPanel" class="enhanced-btn btn-error compact-btn">
+<div id="storagePanel" class="storage-panel">
+    <div class="storage-header">
+        <h3><i class="fas fa-database"></i> Manajemen Penyimpanan</h3>
+        <button id="closeStoragePanel" class="enhanced-btn btn-error compact-btn">
             <i class="fas fa-times"></i>
         </button>
     </div>
     
-    <div class="currency-content">
-        <div class="currency-info">
-            <p>Konversi Rupiah ke mata uang dunia lainnya</p>
-            <div class="update-info">
-                <span id="lastUpdate" class="update-tag">Update: -</span>
-                <span id="connectionStatus" class="status-offline">Offline</span>
+    <div class="storage-content">
+        <div class="storage-info">
+            <p>Kelola penyimpanan data aplikasi di perangkat Anda</p>
+            <div class="status-info">
+                <span id="storageStatus" class="status-tag">Status: -</span>
+                <span id="consentStatus" class="status-consent">Persetujuan: -</span>
             </div>
         </div>
         
-        <div class="currency-converter">
-            <div class="converter-inputs">
-                <div class="input-group">
-                    <label>Dari</label>
-                    <div class="currency-input">
-                        <select id="fromCurrency" class="enhanced-input compact-input">
-                            <option value="IDR">IDR - Rupiah Indonesia</option>
-                            <!-- Mata uang lain akan diisi oleh JavaScript -->
-                        </select>
-                        <input type="number" id="fromAmount" class="enhanced-input compact-input" value="100000" placeholder="Jumlah">
+        <div class="storage-dashboard">
+            <!-- Storage Usage Overview -->
+            <div class="storage-overview">
+                <h4>Penggunaan Penyimpanan</h4>
+                <div class="usage-meter">
+                    <div class="meter-background">
+                        <div class="meter-fill" id="storageMeterFill"></div>
+                    </div>
+                    <div class="usage-stats">
+                        <span id="storageUsageText">0 KB / 5 MB digunakan</span>
+                        <span id="storagePercentage">0%</span>
                     </div>
                 </div>
                 
-                <div class="swap-button-container">
-                    <button id="swapCurrencies" class="enhanced-btn compact-btn">
-                        <i class="fas fa-exchange-alt"></i>
+                <div class="usage-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Data Keuangan</span>
+                        <span class="breakdown-value" id="financeDataSize">0 KB</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Pengaturan</span>
+                        <span class="breakdown-value" id="configDataSize">0 KB</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Backup</span>
+                        <span class="breakdown-value" id="backupDataSize">0 KB</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Cache</span>
+                        <span class="breakdown-value" id="cacheDataSize">0 KB</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Platform Information -->
+            <div class="platform-info">
+                <h4>Informasi Platform</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Platform</span>
+                        <span class="info-value" id="platformInfo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Browser</span>
+                        <span class="info-value" id="browserInfo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Item</span>
+                        <span class="info-value" id="totalItems">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span class="info-value" id="storageStatusInfo">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h4>Aksi Cepat</h4>
+                <div class="actions-grid" id="quickActions">
+                    <div class="action-item" data-action="optimize">
+                        <i class="fas fa-broom"></i>
+                        <span>Optimalkan</span>
+                    </div>
+                    <div class="action-item" data-action="cleanCache">
+                        <i class="fas fa-trash"></i>
+                        <span>Bersihkan Cache</span>
+                    </div>
+                    <div class="action-item" data-action="createBackup">
+                        <i class="fas fa-save"></i>
+                        <span>Backup</span>
+                    </div>
+                    <div class="action-item" data-action="exportData">
+                        <i class="fas fa-download"></i>
+                        <span>Export Data</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Storage Settings -->
+            <div class="storage-settings">
+                <h4>Pengaturan Penyimpanan</h4>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label class="setting-label">Kompresi Data</label>
+                        <label class="setting-switch">
+                            <input type="checkbox" id="compressionToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">Backup Otomatis</label>
+                        <label class="setting-switch">
+                            <input type="checkbox" id="autoBackupToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">Monitoring Real-time</label>
+                        <label class="setting-switch">
+                            <input type="checkbox" id="monitoringToggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">Pembersihan Otomatis</label>
+                        <label class="setting-switch">
+                            <input type="checkbox" id="autoCleanupToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Management -->
+            <div class="data-management">
+                <h4>Manajemen Data</h4>
+                <div class="management-actions">
+                    <button id="importData" class="enhanced-btn btn-primary compact-btn">
+                        <i class="fas fa-upload"></i> Import Data
+                    </button>
+                    <button id="clearAllData" class="enhanced-btn btn-error compact-btn">
+                        <i class="fas fa-trash-alt"></i> Hapus Semua
+                    </button>
+                    <button id="refreshStorage" class="enhanced-btn btn-success compact-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
                     </button>
                 </div>
                 
-                <div class="input-group">
-                    <label>Ke</label>
-                    <div class="currency-input">
-                        <select id="toCurrency" class="enhanced-input compact-input">
-                            <option value="USD">USD - Dolar Amerika</option>
-                            <!-- Mata uang lain akan diisi oleh JavaScript -->
-                        </select>
-                        <input type="number" id="toAmount" class="enhanced-input compact-input" placeholder="Hasil" readonly>
+                <div class="data-list">
+                    <h5>Data Tersimpan</h5>
+                    <div class="table-scroll">
+                        <table class="data-table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Nama Data</th>
+                                    <th>Ukuran</th>
+                                    <th>Terakhir Diubah</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </div>
-            
-            <div class="conversion-rate">
-                <p>Kurs: <span id="conversionRate">-</span></p>
-            </div>
-            
-            <div class="quick-conversions">
-                <h4>Konversi Cepat (IDR →)</h4>
-                <div class="quick-grid" id="quickConversions">
-                    <!-- Konversi cepat akan diisi oleh JavaScript -->
-                </div>
-            </div>
-            
-            <div class="currency-table-container">
-                <h4>Kurs Mata Uang Dunia</h4>
-                <div class="table-scroll">
-                    <table class="currency-table" id="currencyTable">
-                        <thead>
-                            <tr>
-                                <th>Mata Uang</th>
-                                <th>Nama</th>
-                                <th>Nilai (per IDR)</th>
-                                <th>Perubahan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="currencyTableBody">
-                            <!-- Data kurs akan diisi oleh JavaScript -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
         
-        <div class="currency-actions">
-            <button id="updateRates" class="enhanced-btn btn-primary compact-btn">
-                <i class="fas fa-sync-alt"></i> Update Kurs
+        <div class="storage-actions">
+            <button id="optimizeStorage" class="enhanced-btn btn-primary compact-btn">
+                <i class="fas fa-magic"></i> Optimalkan Semua
             </button>
-            <button id="saveOfflineRates" class="enhanced-btn btn-success compact-btn">
-                <i class="fas fa-download"></i> Simpan Offline
+            <button id="showConsentModal" class="enhanced-btn btn-warning compact-btn">
+                <i class="fas fa-shield-alt"></i> Kelola Persetujuan
             </button>
         </div>
     </div>
 </div>
+
 <style>
-    /* ==================== CURRENCY PANEL STYLES ==================== */
-    .currency-panel-toggle {
+    /* ==================== STORAGE PANEL STYLES ==================== */
+    .storage-panel-toggle {
         position: fixed;
         bottom: 10px;
         right: 20px;
@@ -3971,12 +4061,12 @@
         font-size: 24px;
     }
 
-    .currency-panel-toggle:hover {
+    .storage-panel-toggle:hover {
         transform: translateY(-5px) scale(1.1);
         box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
     }
 
-    .currency-panel {
+    .storage-panel {
         position: fixed;
         top: 50%;
         left: 50%;
@@ -3995,52 +4085,52 @@
         border: 1px solid var(--theme-border);
     }
 
-    .currency-panel.active {
+    .storage-panel.active {
         opacity: 1;
         visibility: visible;
         transform: translate(-50%, -50%) scale(1);
     }
 
-    .currency-header {
+    .storage-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 16px 20px;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         color: white;
     }
 
-    .currency-header h3 {
+    .storage-header h3 {
         margin: 0;
         font-size: 18px;
         font-weight: 700;
     }
 
-    .currency-content {
+    .storage-content {
         padding: 20px;
         overflow-y: auto;
         max-height: calc(90vh - 70px);
     }
 
-    .currency-info {
+    .storage-info {
         text-align: center;
         margin-bottom: 20px;
         padding-bottom: 15px;
         border-bottom: 1px solid var(--theme-border);
     }
 
-    .currency-info p {
+    .storage-info p {
         margin-bottom: 10px;
         color: var(--theme-text);
     }
 
-    .update-info {
+    .status-info {
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .update-tag {
+    .status-tag {
         background: rgba(59, 130, 246, 0.1);
         color: #3b82f6;
         padding: 4px 12px;
@@ -4049,7 +4139,7 @@
         font-weight: 600;
     }
 
-    .status-online {
+    .status-consent {
         background: rgba(16, 185, 129, 0.1);
         color: #10b981;
         padding: 4px 12px;
@@ -4058,561 +4148,937 @@
         font-weight: 600;
     }
 
-    .status-offline {
-        background: rgba(107, 114, 128, 0.1);
-        color: #6b7280;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
+    .status-consent.pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
     }
 
-    .currency-converter {
+    .storage-dashboard {
         margin-bottom: 20px;
     }
 
-    .converter-inputs {
-        display: flex;
-        align-items: flex-end;
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-
-    .input-group {
-        flex: 1;
-    }
-
-    .input-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: var(--theme-text);
-    }
-
-    .currency-input {
-        display: flex;
-        gap: 10px;
-    }
-
-    .currency-input select {
-        flex: 1;
-    }
-
-    .currency-input input {
-        width: 120px;
-    }
-
-    .swap-button-container {
-        margin-bottom: 28px;
-    }
-
-    .conversion-rate {
-        text-align: center;
-        margin-bottom: 20px;
-        padding: 10px;
+    .storage-overview {
         background: var(--theme-bg);
         border-radius: var(--radius-lg);
-    }
-
-    .conversion-rate p {
-        margin: 0;
-        font-weight: 600;
-        color: var(--theme-text);
-    }
-
-    .quick-conversions {
+        padding: 20px;
         margin-bottom: 20px;
     }
 
-    .quick-conversions h4 {
-        margin-bottom: 10px;
+    .storage-overview h4 {
+        margin-bottom: 15px;
         color: var(--theme-text);
         font-size: 16px;
     }
 
-    .quick-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
+    .usage-meter {
+        margin-bottom: 15px;
     }
 
-    .quick-conversion-item {
-        background: var(--theme-bg);
+    .meter-background {
+        width: 100%;
+        height: 12px;
+        background: var(--theme-border);
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .meter-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #10b981, #3b82f6);
+        border-radius: 6px;
+        transition: width 0.5s ease;
+        width: 0%;
+    }
+
+    .meter-fill.high {
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+    }
+
+    .usage-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: var(--theme-text);
+    }
+
+    .usage-breakdown {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .breakdown-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--theme-card);
         border-radius: var(--radius-lg);
-        padding: 12px;
-        text-align: center;
-        cursor: pointer;
-        transition: var(--ios-transition);
         border: 1px solid var(--theme-border);
     }
 
-    .quick-conversion-item:hover {
+    .breakdown-label {
+        font-size: 12px;
+        color: var(--theme-text);
+    }
+
+    .breakdown-value {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--theme-primary);
+    }
+
+    .platform-info {
+        background: var(--theme-bg);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .platform-info h4 {
+        margin-bottom: 15px;
+        color: var(--theme-text);
+        font-size: 16px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: var(--theme-text);
+        opacity: 0.7;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--theme-text);
+    }
+
+    .quick-actions {
+        background: var(--theme-bg);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .quick-actions h4 {
+        margin-bottom: 15px;
+        color: var(--theme-text);
+        font-size: 16px;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .action-item {
+        background: var(--theme-card);
+        border: 1px solid var(--theme-border);
+        border-radius: var(--radius-lg);
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--ios-transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-item:hover {
         background: var(--theme-primary);
         color: white;
         transform: translateY(-2px);
     }
 
-    .currency-code {
-        font-weight: 700;
-        font-size: 14px;
+    .action-item i {
+        font-size: 20px;
     }
 
-    .currency-value {
+    .action-item span {
         font-size: 12px;
-        margin-top: 5px;
+        font-weight: 600;
     }
 
-    .currency-table-container {
+    .storage-settings {
+        background: var(--theme-bg);
+        border-radius: var(--radius-lg);
+        padding: 20px;
         margin-bottom: 20px;
     }
 
-    .currency-table-container h4 {
-        margin-bottom: 10px;
+    .storage-settings h4 {
+        margin-bottom: 15px;
         color: var(--theme-text);
         font-size: 16px;
     }
 
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .setting-label {
+        font-size: 14px;
+        color: var(--theme-text);
+    }
+
+    .setting-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .setting-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: var(--theme-primary);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .slider.round {
+        border-radius: 24px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .data-management {
+        background: var(--theme-bg);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .data-management h4 {
+        margin-bottom: 15px;
+        color: var(--theme-text);
+        font-size: 16px;
+    }
+
+    .management-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .management-actions button {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .data-list h5 {
+        margin-bottom: 10px;
+        color: var(--theme-text);
+        font-size: 14px;
+    }
+
     .table-scroll {
-        max-height: 300px;
+        max-height: 200px;
         overflow-y: auto;
         border: 1px solid var(--theme-border);
         border-radius: var(--radius-lg);
     }
 
-    .currency-table {
+    .data-table {
         width: 100%;
         border-collapse: collapse;
         background: var(--theme-card);
     }
 
-    .currency-table th,
-    .currency-table td {
+    .data-table th,
+    .data-table td {
         padding: 12px 15px;
         text-align: left;
         border-bottom: 1px solid var(--theme-border);
+        font-size: 12px;
     }
 
-    .currency-table th {
+    .data-table th {
         background: var(--theme-bg);
         font-weight: 700;
         position: sticky;
         top: 0;
     }
 
-    .currency-table tr:last-child td {
+    .data-table tr:last-child td {
         border-bottom: none;
     }
 
-    .positive-change {
-        color: #10b981;
-        font-weight: 600;
+    .data-actions {
+        display: flex;
+        gap: 5px;
     }
 
-    .negative-change {
-        color: #ef4444;
-        font-weight: 600;
+    .data-btn {
+        padding: 4px 8px;
+        border: none;
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        font-size: 10px;
+        transition: var(--ios-transition);
     }
 
-    .currency-actions {
+    .data-btn.view {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .data-btn.delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .data-btn.export {
+        background: #10b981;
+        color: white;
+    }
+
+    .storage-actions {
         display: flex;
         gap: 10px;
     }
 
-    .currency-actions button {
+    .storage-actions button {
         flex: 1;
     }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
-        .converter-inputs {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .swap-button-container {
-            align-self: center;
-            margin-bottom: 0;
-        }
-        
-        .currency-input {
+        .management-actions {
             flex-direction: column;
         }
         
-        .currency-input input {
-            width: 100%;
+        .management-actions button {
+            min-width: auto;
         }
         
-        .quick-grid {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .actions-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
 
     @media (max-width: 480px) {
-        .currency-panel {
+        .storage-panel {
             width: 98%;
         }
         
-        .currency-content {
+        .storage-content {
             padding: 15px;
         }
         
-        .quick-grid {
+        .usage-breakdown {
             grid-template-columns: 1fr;
         }
         
-        .currency-actions {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .storage-actions {
             flex-direction: column;
         }
     }
 </style>
 
 <script>
-    // ==================== CURRENCY CONVERSION LOGIC ====================
-    const CURRENCY_STATE = {
-        exchangeRates: {},
-        lastUpdated: null,
-        isOnline: false,
-        baseCurrency: 'IDR'
-    };
+// ==================== STORAGE MANAGEMENT LOGIC ====================
+const STORAGE_MANAGER = {
+    // Konfigurasi
+    config: {
+        maxSize: 5 * 1024 * 1024, // 5MB
+        compressionEnabled: true,
+        autoBackup: true,
+        monitoringEnabled: true,
+        autoCleanup: false
+    },
 
-    // Daftar mata uang utama dunia
-    const CURRENCY_LIST = [
-        { code: 'USD', name: 'Dolar Amerika', symbol: '$' },
-        { code: 'EUR', name: 'Euro Eropa', symbol: '€' },
-        { code: 'GBP', name: 'Pound Sterling Inggris', symbol: '£' },
-        { code: 'JPY', name: 'Yen Jepang', symbol: '¥' },
-        { code: 'AUD', name: 'Dolar Australia', symbol: 'A$' },
-        { code: 'CAD', name: 'Dolar Kanada', symbol: 'C$' },
-        { code: 'CHF', name: 'Franc Swiss', symbol: 'CHF' },
-        { code: 'CNY', name: 'Yuan China', symbol: '¥' },
-        { code: 'SGD', name: 'Dolar Singapura', symbol: 'S$' },
-        { code: 'MYR', name: 'Ringgit Malaysia', symbol: 'RM' },
-        { code: 'THB', name: 'Baht Thailand', symbol: '฿' },
-        { code: 'KRW', name: 'Won Korea Selatan', symbol: '₩' },
-        { code: 'INR', name: 'Rupee India', symbol: '₹' },
-        { code: 'BRL', name: 'Real Brasil', symbol: 'R$' },
-        { code: 'RUB', name: 'Rubel Rusia', symbol: '₽' },
-        { code: 'ZAR', name: 'Rand Afrika Selatan', symbol: 'R' },
-        { code: 'AED', name: 'Dirham UAE', symbol: 'د.إ' },
-        { code: 'SAR', name: 'Riyal Saudi', symbol: '﷼' }
-    ];
+    // State
+    state: {
+        platform: 'unknown',
+        browser: 'unknown',
+        consentGiven: false,
+        totalSize: 0,
+        itemCount: 0
+    },
 
-    // Inisialisasi currency panel
-    document.addEventListener('DOMContentLoaded', function() {
-        setupCurrencyEventListeners();
-        initializeCurrencyPanel();
-        loadSavedExchangeRates();
-        checkOnlineStatus();
-    });
+    // Inisialisasi
+    init() {
+        this.detectPlatform();
+        this.loadConfig();
+        this.setupEventListeners();
+        this.updateStorageInfo();
+        
+        console.log('[STORAGE] Manager initialized');
+    },
 
-    function setupCurrencyEventListeners() {
-        // Toggle currency panel
-        document.getElementById('openCurrencyPanel').addEventListener('click', openCurrencyPanel);
-        document.getElementById('closeCurrencyPanel').addEventListener('click', closeCurrencyPanel);
+    // Deteksi platform
+    detectPlatform() {
+        const ua = navigator.userAgent;
         
-        // Currency conversion controls
-        document.getElementById('fromAmount').addEventListener('input', performCurrencyConversion);
-        document.getElementById('fromCurrency').addEventListener('change', performCurrencyConversion);
-        document.getElementById('toCurrency').addEventListener('change', performCurrencyConversion);
-        document.getElementById('swapCurrencies').addEventListener('click', swapCurrencies);
-        
-        // Update and save actions
-        document.getElementById('updateRates').addEventListener('click', updateExchangeRates);
-        document.getElementById('saveOfflineRates').addEventListener('click', saveOfflineRates);
-    }
-
-    function initializeCurrencyPanel() {
-        // Populate currency dropdowns
-        const fromCurrency = document.getElementById('fromCurrency');
-        const toCurrency = document.getElementById('toCurrency');
-        
-        // Clear existing options
-        fromCurrency.innerHTML = '';
-        toCurrency.innerHTML = '';
-        
-        // Add IDR as first option
-        const idrOption = document.createElement('option');
-        idrOption.value = 'IDR';
-        idrOption.textContent = 'IDR - Rupiah Indonesia';
-        fromCurrency.appendChild(idrOption);
-        
-        // Add other currencies
-        CURRENCY_LIST.forEach(currency => {
-            const fromOption = document.createElement('option');
-            fromOption.value = currency.code;
-            fromOption.textContent = `${currency.code} - ${currency.name}`;
-            fromCurrency.appendChild(fromOption);
-            
-            const toOption = document.createElement('option');
-            toOption.value = currency.code;
-            toOption.textContent = `${currency.code} - ${currency.name}`;
-            toCurrency.appendChild(toOption);
-        });
-        
-        // Set default to USD
-        toCurrency.value = 'USD';
-        
-        // Initialize quick conversions
-        initializeQuickConversions();
-    }
-
-    function initializeQuickConversions() {
-        const quickGrid = document.getElementById('quickConversions');
-        quickGrid.innerHTML = '';
-        
-        // Add quick conversion items for major currencies
-        const quickCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'SGD', 'MYR'];
-        
-        quickCurrencies.forEach(code => {
-            const currency = CURRENCY_LIST.find(c => c.code === code);
-            if (currency) {
-                const item = document.createElement('div');
-                item.className = 'quick-conversion-item';
-                item.setAttribute('data-currency', code);
-                item.innerHTML = `
-                    <div class="currency-code">${code}</div>
-                    <div class="currency-value" id="quick${code}">-</div>
-                `;
-                item.addEventListener('click', function() {
-                    document.getElementById('toCurrency').value = code;
-                    performCurrencyConversion();
-                });
-                quickGrid.appendChild(item);
-            }
-        });
-    }
-
-    function openCurrencyPanel() {
-        document.getElementById('currencyPanel').classList.add('active');
-        updateQuickConversions();
-        updateCurrencyTable();
-    }
-
-    function closeCurrencyPanel() {
-        document.getElementById('currencyPanel').classList.remove('active');
-    }
-
-    function swapCurrencies() {
-        const fromCurrency = document.getElementById('fromCurrency');
-        const toCurrency = document.getElementById('toCurrency');
-        const fromAmount = document.getElementById('fromAmount');
-        const toAmount = document.getElementById('toAmount');
-        
-        // Swap currency values
-        const tempCurrency = fromCurrency.value;
-        fromCurrency.value = toCurrency.value;
-        toCurrency.value = tempCurrency;
-        
-        // Swap amount values
-        const tempAmount = fromAmount.value;
-        fromAmount.value = toAmount.value;
-        toAmount.value = tempAmount;
-        
-        // Perform conversion with swapped values
-        performCurrencyConversion();
-    }
-
-    function performCurrencyConversion() {
-        const fromCurrency = document.getElementById('fromCurrency').value;
-        const toCurrency = document.getElementById('toCurrency').value;
-        const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
-        
-        // If same currency, just copy the value
-        if (fromCurrency === toCurrency) {
-            document.getElementById('toAmount').value = fromAmount.toFixed(2);
-            document.getElementById('conversionRate').textContent = '1.00';
-            return;
-        }
-        
-        // Get conversion rate
-        const rate = getConversionRate(fromCurrency, toCurrency);
-        
-        if (rate) {
-            const convertedAmount = fromAmount * rate;
-            document.getElementById('toAmount').value = convertedAmount.toFixed(2);
-            document.getElementById('conversionRate').textContent = rate.toFixed(6);
+        // Deteksi platform
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
+            this.state.platform = 'mobile';
         } else {
-            document.getElementById('toAmount').value = '-';
-            document.getElementById('conversionRate').textContent = 'Tidak tersedia';
+            this.state.platform = 'desktop';
         }
-    }
+        
+        // Deteksi browser
+        if (ua.includes('Chrome')) this.state.browser = 'Chrome';
+        else if (ua.includes('Firefox')) this.state.browser = 'Firefox';
+        else if (ua.includes('Safari')) this.state.browser = 'Safari';
+        else if (ua.includes('Edge')) this.state.browser = 'Edge';
+        else this.state.browser = 'Other';
+    },
 
-    function getConversionRate(fromCurrency, toCurrency) {
-        // If we have direct rates
-        if (CURRENCY_STATE.exchangeRates[fromCurrency] && CURRENCY_STATE.exchangeRates[fromCurrency][toCurrency]) {
-            return CURRENCY_STATE.exchangeRates[fromCurrency][toCurrency];
-        }
-        
-        // If converting from base currency (IDR)
-        if (fromCurrency === CURRENCY_STATE.baseCurrency && CURRENCY_STATE.exchangeRates[toCurrency]) {
-            return CURRENCY_STATE.exchangeRates[toCurrency];
-        }
-        
-        // If converting to base currency (IDR)
-        if (toCurrency === CURRENCY_STATE.baseCurrency && CURRENCY_STATE.exchangeRates[fromCurrency]) {
-            return 1 / CURRENCY_STATE.exchangeRates[fromCurrency];
-        }
-        
-        // Cross conversion using base currency
-        if (CURRENCY_STATE.exchangeRates[fromCurrency] && CURRENCY_STATE.exchangeRates[toCurrency]) {
-            return CURRENCY_STATE.exchangeRates[toCurrency] / CURRENCY_STATE.exchangeRates[fromCurrency];
-        }
-        
-        return null;
-    }
-
-    function updateQuickConversions() {
-        const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
-        
-        // Update quick conversion values
-        const quickCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'SGD', 'MYR'];
-        
-        quickCurrencies.forEach(code => {
-            const rate = getConversionRate('IDR', code);
-            if (rate) {
-                const convertedAmount = fromAmount * rate;
-                document.getElementById(`quick${code}`).textContent = convertedAmount.toFixed(2);
-            } else {
-                document.getElementById(`quick${code}`).textContent = '-';
+    // Load konfigurasi
+    loadConfig() {
+        const savedConfig = localStorage.getItem('stl_storage_config');
+        if (savedConfig) {
+            try {
+                this.config = { ...this.config, ...JSON.parse(savedConfig) };
+                this.updateToggleSwitches();
+            } catch (e) {
+                console.warn('Failed to load storage config');
             }
-        });
-    }
+        }
 
-    function updateCurrencyTable() {
-        const tableBody = document.getElementById('currencyTableBody');
-        tableBody.innerHTML = '';
+        // Check consent
+        const consent = localStorage.getItem('stl_storage_consent');
+        this.state.consentGiven = consent === 'accepted';
+    },
+
+    // Setup event listeners
+    setupEventListeners() {
+        // Panel toggle
+        document.getElementById('openStoragePanel').addEventListener('click', this.openPanel.bind(this));
+        document.getElementById('closeStoragePanel').addEventListener('click', this.closePanel.bind(this));
         
-        CURRENCY_LIST.forEach(currency => {
-            const rate = CURRENCY_STATE.exchangeRates[currency.code];
+        // Quick actions
+        document.querySelectorAll('.action-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const action = e.currentTarget.getAttribute('data-action');
+                this.handleQuickAction(action);
+            });
+        });
+
+        // Settings toggles
+        document.getElementById('compressionToggle').addEventListener('change', (e) => {
+            this.config.compressionEnabled = e.target.checked;
+            this.saveConfig();
+        });
+
+        document.getElementById('autoBackupToggle').addEventListener('change', (e) => {
+            this.config.autoBackup = e.target.checked;
+            this.saveConfig();
+        });
+
+        document.getElementById('monitoringToggle').addEventListener('change', (e) => {
+            this.config.monitoringEnabled = e.target.checked;
+            this.saveConfig();
+        });
+
+        document.getElementById('autoCleanupToggle').addEventListener('change', (e) => {
+            this.config.autoCleanup = e.target.checked;
+            this.saveConfig();
+        });
+
+        // Management actions
+        document.getElementById('importData').addEventListener('click', this.importData.bind(this));
+        document.getElementById('clearAllData').addEventListener('click', this.clearAllData.bind(this));
+        document.getElementById('refreshStorage').addEventListener('click', this.updateStorageInfo.bind(this));
+        document.getElementById('optimizeStorage').addEventListener('click', this.optimizeAll.bind(this));
+        document.getElementById('showConsentModal').addEventListener('click', this.showConsentModal.bind(this));
+    },
+
+    // Update toggle switches berdasarkan config
+    updateToggleSwitches() {
+        document.getElementById('compressionToggle').checked = this.config.compressionEnabled;
+        document.getElementById('autoBackupToggle').checked = this.config.autoBackup;
+        document.getElementById('monitoringToggle').checked = this.config.monitoringEnabled;
+        document.getElementById('autoCleanupToggle').checked = this.config.autoCleanup;
+    },
+
+    // Save konfigurasi
+    saveConfig() {
+        localStorage.setItem('stl_storage_config', JSON.stringify(this.config));
+    },
+
+    // Panel controls
+    openPanel() {
+        document.getElementById('storagePanel').classList.add('active');
+        this.updateStorageInfo();
+    },
+
+    closePanel() {
+        document.getElementById('storagePanel').classList.remove('active');
+    },
+
+    // Update storage information
+    updateStorageInfo() {
+        this.calculateStorageUsage();
+        this.updateUI();
+        this.updateDataTable();
+    },
+
+    // Hitung penggunaan storage
+    calculateStorageUsage() {
+        let totalSize = 0;
+        let itemCount = 0;
+        const breakdown = {
+            finance: 0,
+            config: 0,
+            backup: 0,
+            cache: 0
+        };
+
+        // Hitung semua data STL
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key) && key.startsWith('stl_')) {
+                const itemSize = localStorage[key].length;
+                totalSize += itemSize;
+                itemCount++;
+
+                // Kategorikan data
+                if (key.includes('financial') || key.includes('transaction')) {
+                    breakdown.finance += itemSize;
+                } else if (key.includes('config') || key.includes('theme')) {
+                    breakdown.config += itemSize;
+                } else if (key.includes('backup')) {
+                    breakdown.backup += itemSize;
+                } else if (key.includes('cache') || key.includes('temp')) {
+                    breakdown.cache += itemSize;
+                }
+            }
+        }
+
+        this.state.totalSize = totalSize;
+        this.state.itemCount = itemCount;
+        this.state.breakdown = breakdown;
+    },
+
+    // Update UI
+    updateUI() {
+        const usagePercent = this.state.totalSize / this.config.maxSize;
+        const usageText = `${this.formatSize(this.state.totalSize)} / ${this.formatSize(this.config.maxSize)} digunakan`;
+        
+        // Update usage meter
+        const meterFill = document.getElementById('storageMeterFill');
+        meterFill.style.width = `${Math.min(usagePercent * 100, 100)}%`;
+        
+        if (usagePercent > 0.8) {
+            meterFill.classList.add('high');
+        } else {
+            meterFill.classList.remove('high');
+        }
+
+        // Update text
+        document.getElementById('storageUsageText').textContent = usageText;
+        document.getElementById('storagePercentage').textContent = `${Math.round(usagePercent * 100)}%`;
+
+        // Update breakdown
+        document.getElementById('financeDataSize').textContent = this.formatSize(this.state.breakdown.finance);
+        document.getElementById('configDataSize').textContent = this.formatSize(this.state.breakdown.config);
+        document.getElementById('backupDataSize').textContent = this.formatSize(this.state.breakdown.backup);
+        document.getElementById('cacheDataSize').textContent = this.formatSize(this.state.breakdown.cache);
+
+        // Update platform info
+        document.getElementById('platformInfo').textContent = this.state.platform;
+        document.getElementById('browserInfo').textContent = this.state.browser;
+        document.getElementById('totalItems').textContent = this.state.itemCount;
+
+        // Update status
+        const statusElement = document.getElementById('storageStatusInfo');
+        const consentElement = document.getElementById('consentStatus');
+        
+        if (usagePercent > 0.9) {
+            statusElement.textContent = 'Kritis';
+            statusElement.style.color = '#ef4444';
+        } else if (usagePercent > 0.7) {
+            statusElement.textContent = 'Penuh';
+            statusElement.style.color = '#f59e0b';
+        } else {
+            statusElement.textContent = 'Aman';
+            statusElement.style.color = '#10b981';
+        }
+
+        // Update consent status
+        if (this.state.consentGiven) {
+            consentElement.textContent = 'Persetujuan: Diterima';
+            consentElement.className = 'status-consent';
+        } else {
+            consentElement.textContent = 'Persetujuan: Menunggu';
+            consentElement.className = 'status-consent pending';
+        }
+    },
+
+    // Update data table
+    updateDataTable() {
+        const tableBody = document.getElementById('dataTableBody');
+        tableBody.innerHTML = '';
+
+        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
+
+        stlKeys.forEach(key => {
+            const size = localStorage[key].length;
             const row = document.createElement('tr');
             
-            // Determine change indicator (simulated for demo)
-            const change = Math.random() > 0.5 ? 
-                { value: (Math.random() * 0.5).toFixed(2), direction: 'up' } : 
-                { value: (Math.random() * 0.5).toFixed(2), direction: 'down' };
-            
+            // Coba parse timestamp dari data
+            let lastModified = 'Tidak diketahui';
+            try {
+                const data = JSON.parse(localStorage[key]);
+                if (data.timestamp) {
+                    lastModified = new Date(data.timestamp).toLocaleDateString('id-ID');
+                }
+            } catch (e) {
+                // Jika tidak bisa parse, gunakan waktu sekarang
+                lastModified = new Date().toLocaleDateString('id-ID');
+            }
+
             row.innerHTML = `
-                <td>${currency.code}</td>
-                <td>${currency.name}</td>
-                <td>${rate ? (1 / rate).toFixed(6) : '-'}</td>
-                <td class="${change.direction === 'up' ? 'positive-change' : 'negative-change'}">
-                    ${change.direction === 'up' ? '↑' : '↓'} ${change.value}%
+                <td>${this.getFriendlyName(key)}</td>
+                <td>${this.formatSize(size)}</td>
+                <td>${lastModified}</td>
+                <td class="data-actions">
+                    <button class="data-btn view" data-key="${key}">Lihat</button>
+                    <button class="data-btn delete" data-key="${key}">Hapus</button>
+                    <button class="data-btn export" data-key="${key}">Export</button>
                 </td>
             `;
             
             tableBody.appendChild(row);
         });
-    }
 
-    function checkOnlineStatus() {
-        CURRENCY_STATE.isOnline = navigator.onLine;
-        
-        const statusElement = document.getElementById('connectionStatus');
-        if (CURRENCY_STATE.isOnline) {
-            statusElement.textContent = 'Online';
-            statusElement.className = 'status-online';
-        } else {
-            statusElement.textContent = 'Offline';
-            statusElement.className = 'status-offline';
-        }
-        
-        // Update last update time
-        if (CURRENCY_STATE.lastUpdated) {
-            document.getElementById('lastUpdate').textContent = `Update: ${new Date(CURRENCY_STATE.lastUpdated).toLocaleString('id-ID')}`;
-        }
-    }
+        // Add event listeners to action buttons
+        this.setupDataTableEvents();
+    },
 
-    function updateExchangeRates() {
-        if (!CURRENCY_STATE.isOnline) {
-            updateDynamicIsland('❌ Tidak dapat update kurs (offline)', 2000);
-            return;
+    setupDataTableEvents() {
+        document.querySelectorAll('.data-btn.view').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const key = e.target.getAttribute('data-key');
+                this.viewData(key);
+            });
+        });
+
+        document.querySelectorAll('.data-btn.delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const key = e.target.getAttribute('data-key');
+                this.deleteData(key);
+            });
+        });
+
+        document.querySelectorAll('.data-btn.export').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const key = e.target.getAttribute('data-key');
+                this.exportSingleData(key);
+            });
+        });
+    },
+
+    // Handle quick actions
+    handleQuickAction(action) {
+        switch(action) {
+            case 'optimize':
+                this.optimizeStorage();
+                break;
+            case 'cleanCache':
+                this.cleanCache();
+                break;
+            case 'createBackup':
+                this.createBackup();
+                break;
+            case 'exportData':
+                this.exportAllData();
+                break;
         }
+    },
+
+    // Fungsi optimisasi
+    optimizeStorage() {
+        this.cleanCache();
+        this.compressData();
+        this.updateStorageInfo();
         
-        updateDynamicIsland('🔄 Mengupdate kurs mata uang...', 2000);
+        if (typeof updateDynamicIsland === 'function') {
+            updateDynamicIsland('✅ Penyimpanan dioptimalkan', 2000);
+        }
+    },
+
+    optimizeAll() {
+        this.optimizeStorage();
+        this.createBackup();
         
-        // In a real implementation, this would fetch from an actual API
-        // For demo purposes, we'll simulate with random data
+        if (typeof updateDynamicIsland === 'function') {
+            updateDynamicIsland('✨ Semua optimisasi selesai', 2000);
+        }
+    },
+
+    cleanCache() {
+        const tempKeys = Object.keys(localStorage).filter(key => 
+            key.startsWith('stl_temp_') || key.startsWith('stl_cache_')
+        );
         
-        // Simulate API call delay
-        setTimeout(() => {
-            // Generate realistic exchange rates (simulated)
-            CURRENCY_STATE.exchangeRates = {
-                'USD': 0.000064,  // 1 IDR = 0.000064 USD
-                'EUR': 0.000059,  // 1 IDR = 0.000059 EUR
-                'GBP': 0.000050,  // 1 IDR = 0.000050 GBP
-                'JPY': 0.0096,    // 1 IDR = 0.0096 JPY
-                'AUD': 0.000097,  // 1 IDR = 0.000097 AUD
-                'CAD': 0.000087,  // 1 IDR = 0.000087 CAD
-                'CHF': 0.000057,  // 1 IDR = 0.000057 CHF
-                'CNY': 0.00046,   // 1 IDR = 0.00046 CNY
-                'SGD': 0.000086,  // 1 IDR = 0.000086 SGD
-                'MYR': 0.00030,   // 1 IDR = 0.00030 MYR
-                'THB': 0.0023,    // 1 IDR = 0.0023 THB
-                'KRW': 0.085,     // 1 IDR = 0.085 KRW
-                'INR': 0.0053,    // 1 IDR = 0.0053 INR
-                'BRL': 0.00032,   // 1 IDR = 0.00032 BRL
-                'RUB': 0.0058,    // 1 IDR = 0.0058 RUB
-                'ZAR': 0.0012,    // 1 IDR = 0.0012 ZAR
-                'AED': 0.00023,   // 1 IDR = 0.00023 AED
-                'SAR': 0.00024    // 1 IDR = 0.00024 SAR
+        tempKeys.forEach(key => localStorage.removeItem(key));
+        
+        if (typeof updateDynamicIsland === 'function') {
+            updateDynamicIsland('🗑️ Cache dibersihkan', 2000);
+        }
+    },
+
+    compressData() {
+        if (!this.config.compressionEnabled) return;
+        
+        // Implementasi kompresi sederhana
+        const financialData = localStorage.getItem('stl_udhis_financial_data');
+        if (financialData && financialData.length > 50000) {
+            try {
+                // Simulasi kompresi - di production gunakan library kompresi
+                console.log('Compressing financial data...');
+            } catch (e) {
+                console.warn('Failed to compress data');
+            }
+        }
+    },
+
+    createBackup() {
+        const backupData = {};
+        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
+        
+        stlKeys.forEach(key => {
+            backupData[key] = localStorage.getItem(key);
+        });
+        
+        backupData.timestamp = Date.now();
+        backupData.version = '1.0';
+        
+        localStorage.setItem('stl_manual_backup', JSON.stringify(backupData));
+        
+        if (typeof updateDynamicIsland === 'function') {
+            updateDynamicIsland('💾 Backup dibuat', 2000);
+        }
+    },
+
+    // Data management functions
+    viewData(key) {
+        try {
+            const data = localStorage.getItem(key);
+            const parsed = JSON.parse(data);
+            console.log(`Data ${key}:`, parsed);
+            alert(`Preview data ${key} tersedia di console browser`);
+        } catch (e) {
+            alert('Tidak bisa melihat data ini');
+        }
+    },
+
+    deleteData(key) {
+        if (confirm(`Hapus data ${key}?`)) {
+            localStorage.removeItem(key);
+            this.updateStorageInfo();
+            
+            if (typeof updateDynamicIsland === 'function') {
+                updateDynamicIsland('🗑️ Data dihapus', 2000);
+            }
+        }
+    },
+
+    exportSingleData(key) {
+        const data = localStorage.getItem(key);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${key}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    exportAllData() {
+        const allData = {};
+        const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
+        
+        stlKeys.forEach(key => {
+            allData[key] = localStorage.getItem(key);
+        });
+        
+        const dataStr = JSON.stringify(allData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `stl-full-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        if (typeof updateDynamicIsland === 'function') {
+            updateDynamicIsland('📤 Semua data diexport', 2000);
+        }
+    },
+
+    importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = event => {
+                try {
+                    const importedData = JSON.parse(event.target.result);
+                    Object.keys(importedData).forEach(key => {
+                        if (key.startsWith('stl_')) {
+                            localStorage.setItem(key, importedData[key]);
+                        }
+                    });
+                    
+                    this.updateStorageInfo();
+                    
+                    if (typeof updateDynamicIsland === 'function') {
+                        updateDynamicIsland('✅ Data berhasil diimport', 2000);
+                    }
+                    
+                    // Refresh aplikasi
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                    
+                } catch (error) {
+                    alert('Gagal mengimpor data: Format file tidak valid');
+                }
             };
             
-            CURRENCY_STATE.lastUpdated = new Date().toISOString();
-            
-            // Update UI
-            updateQuickConversions();
-            updateCurrencyTable();
-            checkOnlineStatus();
-            performCurrencyConversion();
-            
-            updateDynamicIsland('✅ Kurs mata uang diperbarui', 2000);
-        }, 1500);
-    }
-
-    function saveOfflineRates() {
-        const data = {
-            exchangeRates: CURRENCY_STATE.exchangeRates,
-            lastUpdated: CURRENCY_STATE.lastUpdated
+            reader.readAsText(file);
         };
         
-        localStorage.setItem('stl_currency_data', JSON.stringify(data));
-        updateDynamicIsland('💾 Data kurs disimpan untuk offline', 2000);
-    }
+        input.click();
+    },
 
-    function loadSavedExchangeRates() {
-        const savedData = localStorage.getItem('stl_currency_data');
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                CURRENCY_STATE.exchangeRates = data.exchangeRates || {};
-                CURRENCY_STATE.lastUpdated = data.lastUpdated;
-                
-                // Update UI with saved data
-                updateQuickConversions();
-                updateCurrencyTable();
-                checkOnlineStatus();
-                performCurrencyConversion();
-            } catch (error) {
-                console.error('Error loading currency data:', error);
+    clearAllData() {
+        if (confirm('HAPUS SEMUA DATA? Tindakan ini tidak dapat dibatalkan!')) {
+            const stlKeys = Object.keys(localStorage).filter(key => key.startsWith('stl_'));
+            stlKeys.forEach(key => localStorage.removeItem(key));
+            
+            this.updateStorageInfo();
+            
+            if (typeof updateDynamicIsland === 'function') {
+                updateDynamicIsland('🗑️ Semua data dihapus', 3000);
             }
-        } else {
-            // Initialize with default rates if no saved data
-            updateExchangeRates();
+            
+            // Refresh aplikasi
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }
+    },
+
+    showConsentModal() {
+        // Panggil fungsi showConsentModal dari storage manager utama jika ada
+        if (window.STORAGE_MANAGER && typeof window.STORAGE_MANAGER.showConsentModal === 'function') {
+            window.STORAGE_MANAGER.showConsentModal();
+        } else {
+            alert('Fungsi persetujuan tidak tersedia. Silakan refresh halaman.');
+        }
+    },
+
+    // Utility functions
+    formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    },
+
+    getFriendlyName(key) {
+        const names = {
+            'stl_udhis_config': 'Konfigurasi Aplikasi',
+            'stl_udhis_financial_data': 'Data Keuangan',
+            'stl_important_history': 'Riwayat Penting',
+            'stl_auto_backup': 'Backup Otomatis',
+            'stl_manual_backup': 'Backup Manual',
+            'stl_storage_config': 'Konfigurasi Penyimpanan',
+            'stl_storage_consent': 'Persetujuan Penyimpanan',
+            'stl_dino_game_data': 'Data Game Dino',
+            'stl_currency_data': 'Data Mata Uang'
+        };
+        
+        return names[key] || key.replace('stl_', '').replace(/_/g, ' ');
     }
+};
 
-    // Listen for online/offline events
-    window.addEventListener('online', function() {
-        CURRENCY_STATE.isOnline = true;
-        checkOnlineStatus();
-        updateDynamicIsland('🌐 Koneksi online tersedia', 2000);
-    });
+// Inisialisasi saat DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    STORAGE_MANAGER.init();
+});
 
-    window.addEventListener('offline', function() {
-        CURRENCY_STATE.isOnline = false;
-        checkOnlineStatus();
-        updateDynamicIsland('📴 Koneksi offline', 2000);
-    });
+// Expose ke global scope
+window.STORAGE_MANAGER_PANEL = STORAGE_MANAGER;
 </script>
 <!-- Tambahkan tombol game dinosaurus di atas tombol currency -->
 <button id="openDinoGame" class="dino-game-toggle">
