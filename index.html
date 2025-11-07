@@ -12888,5 +12888,163 @@ function computeVisualScore() {
         updateDynamicIsland('⚠️ Online mode required but offline', 3000);
     }
 </script>
+<script>
+  // ========== GLOBAL VIEWPORT PIXEL CONTROL ==========
+(function() {
+    'use strict';
+    
+    // Config simpel tapi powerful
+    const PIXEL_MODES = {
+        'auto': { name: 'Auto', scale: 1.0, maxScale: 1.0 },
+        'light': { name: 'Light', scale: 0.9, maxScale: 2.0 },
+        'balanced': { name: 'Balanced', scale: 1.0, maxScale: 3.0 },
+        'quality': { name: 'Quality', scale: 1.1, maxScale: 3.0 },
+        'ultra': { name: 'Ultra', scale: 1.2, maxScale: 4.0 }
+    };
+
+    let currentMode = 'auto';
+
+    // ========== CORE FUNCTION - VIEWPORT CONTROL ==========
+    function applyViewportControl(mode) {
+        const preset = PIXEL_MODES[mode];
+        const viewport = document.querySelector('meta[name="viewport"]');
+        
+        if (!viewport) return;
+        
+        // Powerful viewport control - ini yang akan mempengaruhi SEMUA element
+        viewport.setAttribute('content', 
+            `width=device-width, initial-scale=${preset.scale}, maximum-scale=${preset.maxScale}, user-scalable=yes`
+        );
+        
+        // Set global CSS variable untuk konsistensi
+        document.documentElement.style.setProperty('--pixel-scale', preset.scale);
+        document.documentElement.style.setProperty('--pixel-max-scale', preset.maxScale);
+        
+        currentMode = mode;
+        localStorage.setItem('stl-global-pixel-mode', mode);
+        
+        // Force reflow untuk apply changes
+        document.body.style.display = 'none';
+        document.body.offsetHeight; // Trigger reflow
+        document.body.style.display = '';
+        
+        showNotification(`🖥️ ${preset.name} Mode Active`);
+    }
+
+    // ========== AUTO DETECTION ==========
+    function autoDetectBestMode() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isLowEnd = navigator.deviceMemory < 4;
+        const screenWidth = window.screen.width;
+        
+        if (isMobile && isLowEnd) return 'light';
+        if (isMobile) return 'balanced';
+        if (screenWidth > 1920) return 'ultra';
+        if (screenWidth > 1366) return 'quality';
+        return 'balanced';
+    }
+
+    // ========== SIMPLE UI INTEGRATION ==========
+    function injectPixelControlToScanDevice() {
+        const scanOverlay = document.getElementById('stl-block-overlay');
+        if (!scanOverlay) return;
+        
+        const existingControl = scanOverlay.querySelector('.pixel-global-control');
+        if (existingControl) return;
+        
+        const controlHTML = `
+            <div class="pixel-global-control" style="margin:15px 0; padding:15px; background:rgba(0,0,0,0.3); border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-size:14px; color:#fff; margin-bottom:8px; text-align:center;">🎛️ Global Pixel Control</div>
+                <div style="display:flex; gap:5px; justify-content:center; flex-wrap:wrap;">
+                    ${Object.entries(PIXEL_MODES).map(([key, preset]) => `
+                        <button onclick="window.globalPixelControl.setMode('${key}')" 
+                                style="padding:6px 10px; border-radius:6px; border:1px solid ${currentMode === key ? '#667eea' : 'rgba(255,255,255,0.2)'}; 
+                                       background:${currentMode === key ? 'rgba(102,126,234,0.4)' : 'rgba(255,255,255,0.1)'}; 
+                                       color:white; cursor:pointer; font-size:11px; transition:all 0.2s;">
+                            ${preset.name}
+                        </button>
+                    `).join('')}
+                </div>
+                <div style="text-align:center; font-size:10px; color:rgba(255,255,255,0.6); margin-top:8px;">
+                    Scale: ${PIXEL_MODES[currentMode].scale}x • Max: ${PIXEL_MODES[currentMode].maxScale}x
+                </div>
+            </div>
+        `;
+        
+        const overlayContent = scanOverlay.querySelector('div');
+        if (overlayContent) {
+            overlayContent.insertAdjacentHTML('beforeend', controlHTML);
+        }
+    }
+
+    // ========== GLOBAL CONTROL API ==========
+    window.globalPixelControl = {
+        setMode: function(mode) {
+            if (PIXEL_MODES[mode]) {
+                applyViewportControl(mode);
+                this.updateUI();
+            }
+        },
+        
+        getCurrentMode: function() {
+            return { mode: currentMode, preset: PIXEL_MODES[currentMode] };
+        },
+        
+        updateUI: function() {
+            injectPixelControlToScanDevice();
+        },
+        
+        // Auto optimize based on device
+        autoOptimize: function() {
+            const bestMode = autoDetectBestMode();
+            this.setMode(bestMode);
+        }
+    };
+
+    // ========== NOTIFICATION ==========
+    function showNotification(message) {
+        if (window.updateDynamicIsland) {
+            window.updateDynamicIsland(message, 2000);
+        } else {
+            console.log('Pixel Control:', message);
+        }
+    }
+
+    // ========== INITIALIZATION ==========
+    function initGlobalPixelControl() {
+        // Load saved preference
+        const saved = localStorage.getItem('stl-global-pixel-mode');
+        if (saved && PIXEL_MODES[saved]) {
+            applyViewportControl(saved);
+        } else {
+            // Auto detect first time
+            window.globalPixelControl.autoOptimize();
+        }
+        
+        // Watch for scan device overlay
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1 && (node.id === 'stl-block-overlay' || node.querySelector?.('#stl-block-overlay'))) {
+                        setTimeout(injectPixelControlToScanDevice, 100);
+                    }
+                });
+            });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+        
+        console.log('🎯 Global Pixel Control: READY');
+    }
+
+    // Start when ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGlobalPixelControl);
+    } else {
+        initGlobalPixelControl();
+    }
+
+})();
+</script>
 </body>
 </html>
