@@ -11874,5 +11874,836 @@ function computeVisualScore() {
 
 })();
 </script>
+<!-- ==================== SUPER PERFORMANCE INJECTION SCRIPT ==================== -->
+<script>
+(function() {
+    'use strict';
+    
+    // ========== ULTRA PERFORMANCE CONFIGURATION ==========
+    const PERFORMANCE_CONFIG = {
+        // Memory Management
+        MAX_MEMORY_CACHE: 50, // MB
+        CLEANUP_INTERVAL: 30000, // 30 seconds
+        LAZY_LOAD_THRESHOLD: 0.8, // 80% viewport
+        
+        // Rendering Optimization
+        USE_VIRTUAL_DOM: true,
+        DEBOUNCE_RENDER: 16, // ~60fps
+        BATCH_UPDATES: true,
+        
+        // Network Optimization
+        CACHE_STRATEGY: 'stale-while-revalidate',
+        PRELOAD_CRITICAL: true,
+        CONNECTION_OPTIMIZATION: true
+    };
+
+    // ========== ADVANCED PLATFORM DETECTION ==========
+    class SuperPlatformDetector {
+        constructor() {
+            this.ua = navigator.userAgent;
+            this.platform = this.detectPlatform();
+            this.browser = this.detectBrowser();
+            this.engine = this.detectEngine();
+            this.capabilities = this.detectCapabilities();
+        }
+
+        detectPlatform() {
+            const ua = this.ua.toLowerCase();
+            
+            // OS Detection
+            if (ua.includes('windows')) return 'windows';
+            if (ua.includes('mac os') || ua.includes('macos')) return 'macos';
+            if (ua.includes('linux')) return 'linux';
+            if (ua.includes('android')) return 'android';
+            if (ua.includes('ios') || ua.includes('iphone') || ua.includes('ipad')) return 'ios';
+            if (ua.includes('cros')) return 'chromeos';
+            
+            // Additional mobile detection
+            if (/Mobile|Android|iP(hone|od|ad)/.test(ua)) {
+                if (ua.includes('android')) return 'android';
+                if (ua.includes('iphone') || ua.includes('ipad')) return 'ios';
+                return 'mobile';
+            }
+            
+            return 'unknown';
+        }
+
+        detectBrowser() {
+            const ua = this.ua.toLowerCase();
+            
+            if (ua.includes('chrome') && !ua.includes('edg')) return 'chrome';
+            if (ua.includes('firefox')) return 'firefox';
+            if (ua.includes('safari') && !ua.includes('chrome')) return 'safari';
+            if (ua.includes('edg')) return 'edge';
+            if (ua.includes('opera') || ua.includes('opr')) return 'opera';
+            if (ua.includes('samsung')) return 'samsung';
+            if (ua.includes('ucbrowser')) return 'uc';
+            
+            return 'unknown';
+        }
+
+        detectEngine() {
+            const ua = this.ua.toLowerCase();
+            
+            if (ua.includes('applewebkit')) return 'webkit';
+            if (ua.includes('gecko') && !ua.includes('like gecko')) return 'gecko';
+            if (ua.includes('blink')) return 'blink';
+            if (ua.includes('trident') || ua.includes('msie')) return 'trident';
+            
+            return 'unknown';
+        }
+
+        detectCapabilities() {
+            return {
+                // Web APIs
+                serviceWorker: 'serviceWorker' in navigator,
+                webGL: !!document.createElement('canvas').getContext('webgl'),
+                webGPU: 'gpu' in navigator,
+                wasm: 'WebAssembly' in window,
+                
+                // Storage
+                localStorage: 'localStorage' in window,
+                sessionStorage: 'sessionStorage' in window,
+                indexedDB: 'indexedDB' in window,
+                
+                // Media
+                webRTC: 'RTCPeerConnection' in window,
+                webAudio: 'AudioContext' in window,
+                webSpeech: 'speechSynthesis' in window,
+                
+                // Performance
+                memory: 'memory' in performance,
+                hardwareConcurrency: 'hardwareConcurrency' in navigator,
+                deviceMemory: 'deviceMemory' in navigator,
+                
+                // Modern APIs
+                intersectionObserver: 'IntersectionObserver' in window,
+                mutationObserver: 'MutationObserver' in window,
+                resizeObserver: 'ResizeObserver' in window,
+                performanceObserver: 'PerformanceObserver' in window
+            };
+        }
+
+        getOptimizationProfile() {
+            const profile = {
+                platform: this.platform,
+                browser: this.browser,
+                engine: this.engine,
+                isMobile: ['android', 'ios', 'mobile'].includes(this.platform),
+                isTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+                capabilities: this.capabilities
+            };
+
+            // Platform-specific optimizations
+            if (profile.isMobile) {
+                profile.optimizations = {
+                    useTransform3d: true,
+                    minimizeRepaints: true,
+                    touchOptimized: true,
+                    memoryConservative: true
+                };
+            } else {
+                profile.optimizations = {
+                    useTransform3d: true,
+                    maximizePerformance: true,
+                    preloadAssets: true
+                };
+            }
+
+            // Browser-specific optimizations
+            if (profile.browser === 'safari') {
+                profile.optimizations.safariSpecific = true;
+                profile.optimizations.avoidCertainTransforms = true;
+            }
+
+            return profile;
+        }
+    }
+
+    // ========== MEMORY MANAGEMENT SYSTEM ==========
+    class MemoryManager {
+        constructor() {
+            this.cache = new Map();
+            this.cleanupInterval = setInterval(() => this.cleanup(), PERFORMANCE_CONFIG.CLEANUP_INTERVAL);
+            this.memoryUsage = 0;
+        }
+
+        set(key, value, size = 1) {
+            if (this.memoryUsage + size > PERFORMANCE_CONFIG.MAX_MEMORY_CACHE) {
+                this.evictLRU();
+            }
+            
+            this.cache.set(key, {
+                value: value,
+                size: size,
+                lastAccessed: Date.now()
+            });
+            
+            this.memoryUsage += size;
+        }
+
+        get(key) {
+            const item = this.cache.get(key);
+            if (item) {
+                item.lastAccessed = Date.now();
+                return item.value;
+            }
+            return null;
+        }
+
+        evictLRU() {
+            let oldestKey = null;
+            let oldestTime = Date.now();
+            
+            for (const [key, item] of this.cache) {
+                if (item.lastAccessed < oldestTime) {
+                    oldestTime = item.lastAccessed;
+                    oldestKey = key;
+                }
+            }
+            
+            if (oldestKey) {
+                const item = this.cache.get(oldestKey);
+                this.memoryUsage -= item.size;
+                this.cache.delete(oldestKey);
+            }
+        }
+
+        cleanup() {
+            const now = Date.now();
+            const maxAge = 300000; // 5 minutes
+            
+            for (const [key, item] of this.cache) {
+                if (now - item.lastAccessed > maxAge) {
+                    this.memoryUsage -= item.size;
+                    this.cache.delete(key);
+                }
+            }
+        }
+
+        clear() {
+            this.cache.clear();
+            this.memoryUsage = 0;
+        }
+    }
+
+    // ========== RENDERING OPTIMIZER ==========
+    class RenderingOptimizer {
+        constructor() {
+            this.updateQueue = new Set();
+            this.isBatching = false;
+            this.rafId = null;
+        }
+
+        scheduleUpdate(element, updateFn) {
+            this.updateQueue.add({ element, updateFn });
+            
+            if (!this.isBatching) {
+                this.isBatching = true;
+                this.rafId = requestAnimationFrame(() => this.processUpdates());
+            }
+        }
+
+        processUpdates() {
+            const updates = Array.from(this.updateQueue);
+            this.updateQueue.clear();
+            
+            // Batch DOM reads
+            const reads = updates.map(update => ({
+                element: update.element,
+                metrics: this.getMetrics(update.element)
+            }));
+            
+            // Batch DOM writes
+            updates.forEach((update, index) => {
+                update.updateFn(update.element, reads[index].metrics);
+            });
+            
+            this.isBatching = false;
+        }
+
+        getMetrics(element) {
+            return {
+                rect: element.getBoundingClientRect(),
+                computedStyle: window.getComputedStyle(element)
+            };
+        }
+
+        cancel() {
+            if (this.rafId) {
+                cancelAnimationFrame(this.rafId);
+                this.rafId = null;
+            }
+            this.updateQueue.clear();
+            this.isBatching = false;
+        }
+    }
+
+    // ========== NETWORK OPTIMIZER ==========
+    class NetworkOptimizer {
+        constructor() {
+            this.cache = new MemoryManager();
+            this.preloadQueue = new Set();
+        }
+
+        async fetchWithCache(url, options = {}) {
+            const cacheKey = `network:${url}`;
+            const cached = this.cache.get(cacheKey);
+            
+            if (cached && !options.forceRefresh) {
+                return cached;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Cache-Control': 'max-age=300',
+                        ...options.headers
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    this.cache.set(cacheKey, data, 1);
+                    return data;
+                }
+            } catch (error) {
+                console.warn('Network request failed:', error);
+                return cached || null;
+            }
+        }
+
+        preloadResource(url, type = 'script') {
+            if (this.preloadQueue.has(url)) return;
+            
+            this.preloadQueue.add(url);
+            
+            const link = document.createElement('link');
+            link.rel = type === 'script' ? 'preload' : 'prefetch';
+            link.href = url;
+            link.as = type;
+            
+            if (type === 'script') {
+                link.onload = () => this.preloadQueue.delete(url);
+                link.onerror = () => this.preloadQueue.delete(url);
+            }
+            
+            document.head.appendChild(link);
+        }
+
+        optimizeImages() {
+            const images = document.querySelectorAll('img[data-src], img[data-srcset]');
+            
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        this.loadImage(img);
+                        io.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.1
+            });
+            
+            images.forEach(img => io.observe(img));
+        }
+
+        loadImage(img) {
+            const src = img.getAttribute('data-src');
+            const srcset = img.getAttribute('data-srcset');
+            
+            if (src) img.src = src;
+            if (srcset) img.srcset = srcset;
+            
+            img.removeAttribute('data-src');
+            img.removeAttribute('data-srcset');
+        }
+    }
+
+    // ========== EVENT OPTIMIZER ==========
+    class EventOptimizer {
+        constructor() {
+            this.handlers = new Map();
+            this.passiveEvents = ['touchstart', 'touchmove', 'wheel', 'mousewheel'];
+        }
+
+        addEventListener(element, event, handler, options = {}) {
+            const optimizedOptions = this.getOptimizedOptions(options);
+            const wrappedHandler = this.wrapHandler(handler, element, event);
+            
+            element.addEventListener(event, wrappedHandler, optimizedOptions);
+            
+            const key = `${event}-${handler.toString().hashCode()}`;
+            this.handlers.set(key, { element, event, handler: wrappedHandler, options: optimizedOptions });
+            
+            return () => this.removeEventListener(key);
+        }
+
+        removeEventListener(key) {
+            const handlerInfo = this.handlers.get(key);
+            if (handlerInfo) {
+                handlerInfo.element.removeEventListener(
+                    handlerInfo.event, 
+                    handlerInfo.handler, 
+                    handlerInfo.options
+                );
+                this.handlers.delete(key);
+            }
+        }
+
+        getOptimizedOptions(options) {
+            if (this.passiveEvents.includes(options.event) && options.passive === undefined) {
+                return { ...options, passive: true };
+            }
+            return options;
+        }
+
+        wrapHandler(handler, element, event) {
+            return function optimizedHandler(e) {
+                // Prevent default only when necessary
+                if (handler.preventDefault && e.cancelable) {
+                    e.preventDefault();
+                }
+                
+                // Stop propagation only when necessary
+                if (handler.stopPropagation) {
+                    e.stopPropagation();
+                }
+                
+                handler.call(element, e);
+            };
+        }
+
+        debounce(fn, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        throttle(fn, limit) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    fn.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            };
+        }
+    }
+
+    // ========== MAIN PERFORMANCE BOOSTER ==========
+    class PerformanceBooster {
+        constructor() {
+            this.detector = new SuperPlatformDetector();
+            this.memoryManager = new MemoryManager();
+            this.renderOptimizer = new RenderingOptimizer();
+            this.networkOptimizer = new NetworkOptimizer();
+            this.eventOptimizer = new EventOptimizer();
+            this.profile = this.detector.getOptimizationProfile();
+            
+            this.init();
+        }
+
+        init() {
+            this.applyPlatformOptimizations();
+            this.setupPerformanceMonitoring();
+            this.optimizeCriticalPath();
+            this.setupMemoryProtection();
+            this.injectCSSOptimizations();
+        }
+
+        applyPlatformOptimizations() {
+            const { platform, browser, optimizations } = this.profile;
+            
+            // Add platform classes to HTML
+            document.documentElement.classList.add(
+                `platform-${platform}`,
+                `browser-${browser}`,
+                optimizations.isMobile ? 'mobile-device' : 'desktop-device',
+                optimizations.isTouch ? 'touch-device' : 'pointer-device`
+            );
+
+            // Platform-specific optimizations
+            if (optimizations.isMobile) {
+                this.optimizeForMobile();
+            } else {
+                this.optimizeForDesktop();
+            }
+
+            // Browser-specific fixes
+            if (browser === 'safari') {
+                this.applySafariFixes();
+            }
+        }
+
+        optimizeForMobile() {
+            // Touch optimization
+            this.eventOptimizer.addEventListener(document, 'touchstart', () => {}, { passive: true });
+            this.eventOptimizer.addEventListener(document, 'touchmove', () => {}, { passive: true });
+            
+            // Viewport optimization
+            this.setViewportOptimization();
+            
+            // Memory optimization
+            this.setupMemoryWatcher();
+        }
+
+        optimizeForDesktop() {
+            // Enable hardware acceleration
+            this.enableHardwareAcceleration();
+            
+            // Preload critical resources
+            this.preloadCriticalAssets();
+        }
+
+        applySafariFixes() {
+            // Safari-specific CSS fixes
+            const style = document.createElement('style');
+            style.textContent = `
+                .safari-fix {
+                    -webkit-transform: translateZ(0);
+                    transform: translateZ(0);
+                }
+                input, textarea {
+                    -webkit-appearance: none;
+                    border-radius: 0;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        setViewportOptimization() {
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.setAttribute('content', 
+                    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no'
+                );
+            }
+        }
+
+        enableHardwareAcceleration() {
+            const style = document.createElement('style');
+            style.textContent = `
+                .hardware-accelerated {
+                    transform: translateZ(0);
+                    backface-visibility: hidden;
+                    perspective: 1000px;
+                }
+                .will-change {
+                    will-change: transform, opacity;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        preloadCriticalAssets() {
+            // Preload critical fonts
+            this.networkOptimizer.preloadResource('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap', 'style');
+            
+            // Preload critical images
+            const criticalImages = [
+                'https://pfst.cf2.poecdn.net/base/image/d6d81ade0a0eeac8cf2315ace4420bf84df883795c9513b9b3af822e0d0730ae?w=1563&h=1563'
+            ];
+            
+            criticalImages.forEach(img => this.networkOptimizer.preloadResource(img, 'image'));
+        }
+
+        setupPerformanceMonitoring() {
+            // Monitor long tasks
+            if ('PerformanceObserver' in window) {
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        if (entry.duration > 50) {
+                            console.warn('Long task detected:', entry);
+                            this.optimizeLongTask(entry);
+                        }
+                    }
+                });
+                
+                observer.observe({ entryTypes: ['longtask'] });
+            }
+
+            // Monitor memory usage
+            this.setupMemoryWatcher();
+        }
+
+        setupMemoryWatcher() {
+            if ('memory' in performance) {
+                setInterval(() => {
+                    const memory = performance.memory;
+                    const used = memory.usedJSHeapSize / 1048576; // Convert to MB
+                    
+                    if (used > PERFORMANCE_CONFIG.MAX_MEMORY_CACHE * 0.8) {
+                        this.memoryManager.cleanup();
+                        this.forceGarbageCollection();
+                    }
+                }, 10000);
+            }
+        }
+
+        forceGarbageCollection() {
+            if (window.gc) {
+                window.gc();
+            } else if (window.GCController) {
+                window.GCController.collect();
+            } else {
+                // Force GC by allocating and releasing memory
+                try {
+                    const garbage = new Array(1000000).fill(null);
+                    setTimeout(() => garbage.length = 0, 0);
+                } catch (e) {}
+            }
+        }
+
+        optimizeCriticalPath() {
+            // Defer non-critical CSS
+            this.deferNonCriticalCSS();
+            
+            // Optimize images
+            this.networkOptimizer.optimizeImages();
+            
+            // Remove unused CSS/JS
+            this.removeUnusedResources();
+        }
+
+        deferNonCriticalCSS() {
+            const nonCriticalLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+                .filter(link => !link.media || link.media === 'all');
+            
+            nonCriticalLinks.forEach(link => {
+                link.media = 'print';
+                link.onload = () => link.media = 'all';
+            });
+        }
+
+        removeUnusedResources() {
+            // Remove duplicate or unused resources
+            const resources = {
+                scripts: new Set(),
+                styles: new Set()
+            };
+            
+            Array.from(document.querySelectorAll('script[src]')).forEach(script => {
+                const src = script.src;
+                if (resources.scripts.has(src)) {
+                    script.remove();
+                } else {
+                    resources.scripts.add(src);
+                }
+            });
+            
+            Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach(link => {
+                const href = link.href;
+                if (resources.styles.has(href)) {
+                    link.remove();
+                } else {
+                    resources.styles.add(href);
+                }
+            });
+        }
+
+        setupMemoryProtection() {
+            // Protect against memory leaks
+            window.addEventListener('beforeunload', () => {
+                this.cleanup();
+            });
+
+            // Handle page visibility changes
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    this.reduceMemoryUsage();
+                }
+            });
+        }
+
+        reduceMemoryUsage() {
+            this.memoryManager.cleanup();
+            this.renderOptimizer.cancel();
+            this.forceGarbageCollection();
+        }
+
+        injectCSSOptimizations() {
+            const optimizedCSS = `
+                /* Performance Optimized CSS */
+                .performance-optimized {
+                    /* Containment for better performance */
+                    contain: layout style paint;
+                    /* Optimize scrolling */
+                    -webkit-overflow-scrolling: touch;
+                    /* Reduce repaints */
+                    backface-visibility: hidden;
+                }
+                
+                /* Optimize animations */
+                @media (prefers-reduced-motion: no-preference) {
+                    .optimized-animation {
+                        animation-duration: 0.3s;
+                        animation-fill-mode: both;
+                        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                }
+                
+                /* Critical above-the-fold styles */
+                .critical-render {
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    display: block !important;
+                }
+                
+                /* Hardware acceleration layers */
+                .gpu-layer {
+                    transform: translateZ(0);
+                    -webkit-transform: translateZ(0);
+                }
+            `;
+            
+            const style = document.createElement('style');
+            style.textContent = optimizedCSS;
+            style.setAttribute('data-performance', 'optimized');
+            document.head.appendChild(style);
+        }
+
+        optimizeLongTask(entry) {
+            console.log('Optimizing long task:', entry.name);
+            
+            // Split long tasks
+            if (entry.duration > 100) {
+                setTimeout(() => {
+                    this.forceGarbageCollection();
+                }, 0);
+            }
+        }
+
+        cleanup() {
+            this.memoryManager.clear();
+            this.renderOptimizer.cancel();
+            clearInterval(this.memoryManager.cleanupInterval);
+        }
+    }
+
+    // ========== HELPER FUNCTIONS ==========
+    
+    // String hash function for handler keys
+    String.prototype.hashCode = function() {
+        let hash = 0;
+        for (let i = 0; i < this.length; i++) {
+            const char = this.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
+    };
+
+    // ========== INITIALIZATION ==========
+    
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.SUPER_PERFORMANCE = new PerformanceBooster();
+        });
+    } else {
+        window.SUPER_PERFORMANCE = new PerformanceBooster();
+    }
+
+    // Expose to global scope for debugging
+    window.PerformanceBooster = PerformanceBooster;
+    window.SuperPlatformDetector = SuperPlatformDetector;
+
+    console.log('🚀 Super Performance Booster Activated!');
+})();
+</script>
+
+<!-- ==================== CRITICAL PERFORMANCE CSS ==================== -->
+<style>
+/* Critical rendering path optimizations */
+html.super-perf {
+    /* Force hardware acceleration */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+body.super-perf {
+    /* Contain layout */
+    contain: layout style paint;
+    /* Optimize text rendering */
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Improve scrolling */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Platform-specific optimizations */
+.platform-ios body {
+    /* iOS specific optimizations */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+.platform-android body {
+    /* Android specific optimizations */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.browser-safari .enhanced-card {
+    /* Safari rendering fixes */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+/* Performance-critical animations */
+@media (prefers-reduced-motion: no-preference) {
+    .performance-animation {
+        animation-duration: 0.2s;
+        animation-fill-mode: both;
+        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        /* Use transforms for animations */
+        will-change: transform, opacity;
+    }
+}
+
+/* Optimize images and media */
+img.performance-optimized {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+}
+
+/* Reduce layout thrashing */
+.stable-layout {
+    contain: layout style paint;
+}
+
+/* Memory efficient shadows */
+.memory-shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (min-width: 768px) {
+    .memory-shadow {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    }
+}
+
+/* Optimize expensive CSS properties */
+.performance-paint {
+    /* Avoid expensive properties */
+    box-shadow: none;
+    border-radius: 0;
+    opacity: 1;
+}
+
+.performance-paint.expensive {
+    /* Only apply when necessary */
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+}
+</style>
 </body>
 </html>
