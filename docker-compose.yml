@@ -1,0 +1,32 @@
+
+version: "3.8"
+
+services:
+  stl-backend:
+    image: python:3.11-slim
+    container_name: stl-backend
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    command: bash -c "pip install -r requirements.txt && python backend.py"
+    profiles: ["atlas","local"]
+
+  mongo-local:
+    image: mongo:6.0
+    container_name: stl-mongo-local
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    profiles: ["local"]
+
+volumes:
+  mongo_data:
