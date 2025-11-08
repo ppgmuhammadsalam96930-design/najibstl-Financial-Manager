@@ -1,0 +1,16 @@
+{
+  "name": "stl-udhis-backend",
+  "version": "1.0.0",
+  "description": "Server for STL UDHIS Financial Manager",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
