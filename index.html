@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
+  
 <script>
 (function(){
   'use strict';
+  // 👇 TEMPATKAN KODE DI SINI (SETELAH 'use strict';)
+  // ==================== KONSTANTA KRITIS BACKEND ====================
+  const PY_BACKEND = 'http://localhost:5000'; // GANTI URL Anda
+  const TOKEN_KEY = 'user_jwt_token';      
+  const EMAIL_KEY = 'user_email';          
+  // ==================================================================
 
+  // Fungsi sederhana untuk memeriksa apakah pengguna sudah login
+  function requireLogin() {
+      if (localStorage.getItem(TOKEN_KEY)) return true;
+      // ...
+      return false;
+  }
+  
   // ========== CONFIG ==========
   const ANDROID_MIN_MAJOR = 4;
   const ANDROID_MAX_MAJOR = 26;
@@ -334,9 +347,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/mongoDBjs/9.6.1/mongoDB-app-compat.js"></script>
+    <script src="https://www.gstatic.com/mongoDBjs/9.6.1/mongoDB-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/mongoDBjs/9.6.1/mongoDB-firestore-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -5041,7 +5054,7 @@ const MongoDBInjector = {
     async saveToCloud() {
         const uid = this.getUserId();
         if (uid === 'GUEST-12345') {
-            alert('Silakan login untuk menyimpan data ke cloud.');
+            alert('');
             return;
         }
 
@@ -5094,7 +5107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-    const firebaseConfig = {
+    const mongoDBConfig = {
         apiKey: "API_KEY_ANDA_DI_SINI", 
         authDomain: "AUTH_DOMAIN_ANDA_DI_SINI",
         projectId: "PROJECT_ID_ANDA_DI_SINI",
@@ -5104,24 +5117,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let fb_auth, fb_db;
 
     try {
-        const firebaseApp = firebase.initializeApp(firebaseConfig);
-        fb_auth = firebase.auth();
-        fb_db = firebase.firestore();
-        console.log('🔥 Firebase Injected and Initialized.');
+        const mongoDBApp = mongoDB.initializeApp(mongoDBConfig);
+        fb_auth = mongoDB.auth();
+        fb_db = mongoDB.firestore();
+        console.log('🔥 mongoDB Injected and Initialized.');
     } catch (e) {
-        console.error('❌ Gagal Inisialisasi Firebase:', e);
+        console.error('❌ Gagal Inisialisasi mongoDB:', e);
         // Tampilkan pesan error jika inisialisasi gagal (misal: config salah)
-        if(window.showSystemAlert) showSystemAlert('Koneksi Firebase Gagal. Cek konfigurasi Anda.', 'error');
+        if(window.showSystemAlert) showSystemAlert('Koneksi mongoDB Gagal. Cek konfigurasi Anda.', 'error');
     }
 
     // ========== AUTHENTICATOR (MENGGANTIKAN unlockRekening LAMA) ==========
-    const FirebaseAuthenticator = {
+    const mongoDBAuthenticator = {
         currentUser: null,
 
         // Panggil fungsi ini dari tombol "Login" Anda
         signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            // Minta Firebase untuk menggunakan mode pop-up
+            const provider = new mongoDB.auth.GoogleAuthProvider();
+            // Minta mongoDB untuk menggunakan mode pop-up
             fb_auth.signInWithPopup(provider)
                 .then((result) => {
                     console.log('Login sukses:', result.user.displayName);
@@ -5158,7 +5171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('rekeningContent').style.display = 'block';
                     
                     // --- FUNGSI PENTING: MUAT DATA ---
-                    FirebaseDataManager.loadAllData(user.uid);
+                    mongoDBDataManager.loadAllData(user.uid);
                     
                     // Update Dynamic Island
                     if(window.updateDynamicIsland) updateDynamicIsland(`Selamat datang, ${user.displayName}!`, 3000);
@@ -5176,7 +5189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ========== DATA MANAGER (PENGGANTI saveData/loadSavedData) ==========
-    const FirebaseDataManager = {
+    const mongoDBDataManager = {
 
         // Menggantikan window.saveData()
         async saveAllData(uid) {
@@ -5196,9 +5209,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 await userDocRef.set({
                     payload: dataToSave,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    lastUpdated: mongoDB.firestore.FieldValue.serverTimestamp()
                 });
-                console.log('☁️ Data berhasil disimpan ke Firebase');
+                console.log('☁️ Data berhasil disimpan ke mongoDB');
                 if(window.updateDynamicIsland) updateDynamicIsland('☁️ Data tersinkronisasi ke cloud', 1500);
                 
             } catch (error) {
@@ -5221,7 +5234,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     Object.assign(window.FINANCIAL_STATE, data.FINANCIAL_STATE);
                     Object.assign(window.ACCOUNT_STATE, data.ACCOUNT_STATE);
                     
-                    console.log('☁️ Data berhasil dimuat dari Firebase');
+                    console.log('☁️ Data berhasil dimuat dari mongoDB');
                 } else {
                     console.log('☁️ Data cloud kosong, menggunakan data lokal/kosong.');
                     // Di sini Anda bisa memanggil fungsi inisialisasi data kosong jika perlu.
@@ -5243,7 +5256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========== INJEKSI DOM DAN WRAPPER ==========
     document.addEventListener('DOMContentLoaded', () => {
         // 1. MULAI LISTENER AUTHENTIKASI
-        if (fb_auth) FirebaseAuthenticator.initAuthListener();
+        if (fb_auth) mongoDBAuthenticator.initAuthListener();
         
         // 2. GANTI FUNGSI SAVE DATA GLOBAL
         const oldSaveData = window.saveData; // Simpan fungsi lama jika Anda ingin tetap menyimpan ke localStorage
@@ -5252,9 +5265,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof oldSaveData === 'function') oldSaveData();
 
             // Kedua, simpan ke cloud jika sudah login
-            const uid = FirebaseAuthenticator.currentUser?.uid;
+            const uid = mongoDBAuthenticator.currentUser?.uid;
             if (uid) {
-                FirebaseDataManager.saveAllData(uid);
+                mongoDBDataManager.saveAllData(uid);
             }
         };
 
@@ -5269,7 +5282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             newUnlockButton.innerHTML = '<i class="fab fa-google mr-2"></i> Login dengan Google';
             newUnlockButton.addEventListener('click', () => {
                 // Notifikasi browser akan hilang jika diakses via HTTPS
-                FirebaseAuthenticator.signInWithGoogle();
+                mongoDBAuthenticator.signInWithGoogle();
             });
             
             // Sembunyikan input passphrase lama
@@ -5282,11 +5295,11 @@ document.addEventListener('DOMContentLoaded', () => {
             lockButton.replaceWith(lockButton.cloneNode(true));
             const newLockButton = document.getElementById('lockRekening');
             newLockButton.innerHTML = '<i class="fas fa-sign-out-alt mr-2"></i> Logout';
-            newLockButton.addEventListener('click', FirebaseAuthenticator.signOut);
+            newLockButton.addEventListener('click', mongoDBAuthenticator.signOut);
         }
     });
 
-    // ==================== AKHIR DARI INJEKSI FIREBASE ====================
+    // ==================== AKHIR DARI INJEKSI mongoDB ====================
 </script>
 <script>
 // Anda harus mendapatkan token ini saat login berhasil!
@@ -9252,7 +9265,7 @@ if(syncBtn) syncBtn.addEventListener('click', syncDataToPythonBackend);
             meaning: "Harganya bikin kantong kempes",
             options: ["MURAH", "BAIK", "INDAH", "BAGUS"],
             correct: 0,
-            hint: "Tukang jualan suka bilang: 'ga mahal-mahal amat kok'"
+            hint: "Tukang jualan ***** bilang: 'ga mahal-mahal amat kok'"
         },
         {
             word: "CEPAT",
@@ -9333,7 +9346,7 @@ if(syncBtn) syncBtn.addEventListener('click', syncDataToPythonBackend);
         },
         {
             word: "BAIK",
-            meaning: "Suka menolong, hatinya bersih",
+            meaning: "***** menolong, hatinya bersih",
             options: ["JAHAT", "NAKAL", "USIL", "ISENG"],
             correct: 0,
             hint: "Sifat antagonis di sinetron"
@@ -13481,15 +13494,15 @@ img.performance-optimized {
 }
 </style>
 <script>
-  // ==================== INJEKSI FIREBASE: AUTH + FIRESTORE + STORAGE ====================
+  // ==================== INJEKSI mongoDB: AUTH + FIRESTORE + STORAGE ====================
 // LETAKKAN INI DI BAWAH SEMUA SCRIPT LAIN SEBELUM </body>
-// Pastikan SDK firebase-app-compat, firebase-auth-compat, firebase-firestore-compat sudah ada di <head>.
+// Pastikan SDK mongoDB-app-compat, mongoDB-auth-compat, mongoDB-firestore-compat sudah ada di <head>.
 
 (function(){
   'use strict';
 
-  // --------- 1) CONFIG: masukkan firebaseConfig Anda di sini ---------
-  const firebaseConfig = {
+  // --------- 1) CONFIG: masukkan mongoDBConfig Anda di sini ---------
+  const mongoDBConfig = {
     apiKey: "GANTI_DENGAN_API_KEY_ANDA",
     authDomain: "GANTI_DENGAN_AUTH_DOMAIN_ANDA",
     projectId: "GANTI_DENGAN_PROJECT_ID_ANDA",
@@ -13498,16 +13511,16 @@ img.performance-optimized {
     appId: "GANTI_DENGAN_APP_ID_ANDA"
   };
 
-  // --------- 2) INIT Firebase (compat) ---------
+  // --------- 2) INIT mongoDB (compat) ---------
   let fb_app, fb_auth, fb_db, fb_storage;
   try {
-    fb_app = firebase.initializeApp(firebaseConfig);
-    fb_auth = firebase.auth();
-    fb_db = firebase.firestore();
-    fb_storage = firebase.storage();
-    console.log('🔥 Firebase initialized (inject)');
+    fb_app = mongoDB.initializeApp(mongoDBConfig);
+    fb_auth = mongoDB.auth();
+    fb_db = mongoDB.firestore();
+    fb_storage = mongoDB.storage();
+    console.log('🔥 mongoDB initialized (inject)');
   } catch (err) {
-    console.error('❌ Firebase init fail:', err);
+    console.error('❌ mongoDB init fail:', err);
     // non-fatal: fall back to local-only mode (we'll still keep existing localStorage)
   }
 
@@ -13524,23 +13537,23 @@ img.performance-optimized {
     } catch (e) { console.warn('aesDecrypt fail', e); return null; }
   }
 
-  // --------- 4) Firebase Auth wrapper (Google) ---------
-  const FirebaseAuthenticator = {
+  // --------- 4) mongoDB Auth wrapper (Google) ---------
+  const mongoDBAuthenticator = {
     currentUser: null,
     initAuthListener() {
       if(!fb_auth) return;
       fb_auth.onAuthStateChanged(user => {
         this.currentUser = user || null;
         if(user) {
-          console.log('🔐 Firebase user:', user.uid, user.email);
+          console.log('🔐 mongoDB user:', user.uid, user.email);
           // UI swap: sembunyikan layar passphrase, tampilkan content jika ada
           try {
             document.getElementById('rekeningAuth').style.display = 'none';
             document.getElementById('rekeningContent').style.display = 'block';
           } catch(e){}
-          FirebaseDataManager.loadAllData(user.uid);
+          mongoDBDataManager.loadAllData(user.uid);
         } else {
-          console.log('🔓 No firebase user');
+          console.log('🔓 No mongoDB user');
           try {
             document.getElementById('rekeningAuth').style.display = 'block';
             document.getElementById('rekeningContent').style.display = 'none';
@@ -13549,8 +13562,8 @@ img.performance-optimized {
       });
     },
     signInWithGoogle() {
-      if(!fb_auth) { showAccountMessage('Firebase tidak tersedia', 'error'); return; }
-      const provider = new firebase.auth.GoogleAuthProvider();
+      if(!fb_auth) { showAccountMessage('mongoDB tidak tersedia', 'error'); return; }
+      const provider = new mongoDB.auth.GoogleAuthProvider();
       fb_auth.signInWithPopup(provider).catch(err => {
         console.error('Google signIn failed', err);
         showAccountMessage('Login Google gagal: ' + (err.message || err), 'error');
@@ -13568,8 +13581,8 @@ img.performance-optimized {
     }
   };
 
-  // --------- 5) Firebase Data Manager: Firestore for JSON state, Storage for large backups ---------
-  const FirebaseDataManager = {
+  // --------- 5) mongoDB Data Manager: Firestore for JSON state, Storage for large backups ---------
+  const mongoDBDataManager = {
     async saveAllData(uid, pass) {
       if(!fb_db || !uid) return;
       // Build payload: encrypt both states with user-provided passphrase (pass required for re-encryption)
@@ -13592,7 +13605,7 @@ img.performance-optimized {
         await fb_db.collection('userData').doc(uid).set({
           finance: encFinance,
           accounts: encAccounts,
-          meta: { updatedAt: firebase.firestore.FieldValue.serverTimestamp(), version: 1 }
+          meta: { updatedAt: mongoDB.firestore.FieldValue.serverTimestamp(), version: 1 }
         }, { merge: true });
         console.log('☁️ saveAllData -> Firestore OK');
         if(window.updateDynamicIsland) updateDynamicIsland('☁️ Data tersinkronisasi ke cloud', 1400);
@@ -13613,7 +13626,7 @@ img.performance-optimized {
         const d = doc.data();
         // d.finance & d.accounts are encrypted strings (AES by client)
         // We do NOT have passphrase here; caller must provide passphrase (we'll call decryptAttempt)
-        window.__STL__firebasePayload = d; // temporarily store for decryption attempt
+        window.__STL__mongoDBPayload = d; // temporarily store for decryption attempt
         console.log('☁️ userData payload loaded (encrypted)');
         // Caller expected to call decryptUsingPassphrase(pass)
       } catch (e) {
@@ -13622,9 +13635,9 @@ img.performance-optimized {
       }
     },
 
-    // Upload encrypted backup blob to Firebase Storage and return download URL
+    // Upload encrypted backup blob to mongoDB Storage and return download URL
     async uploadBackupBlob(uid, filename, blob) {
-      if(!fb_storage || !uid) throw new Error('Firebase Storage unavailable');
+      if(!fb_storage || !uid) throw new Error('mongoDB Storage unavailable');
       const ref = fb_storage.ref().child(`backups/${uid}/${filename}`);
       const snapshot = await ref.put(blob);
       const url = await snapshot.ref.getDownloadURL();
@@ -13633,7 +13646,7 @@ img.performance-optimized {
 
     // Download backup blob reference (if you saved URL previously)
     async deleteBackup(uid, filename) {
-      if(!fb_storage || !uid) throw new Error('Firebase Storage unavailable');
+      if(!fb_storage || !uid) throw new Error('mongoDB Storage unavailable');
       const ref = fb_storage.ref().child(`backups/${uid}/${filename}`);
       return ref.delete();
     }
@@ -13645,13 +13658,13 @@ img.performance-optimized {
 
   window.saveData = function() {
     try {
-      // If user authenticated with Firebase AND ACCOUNT_STATE.passphrase exists -> save encrypted to Firestore
-      const uid = FirebaseAuthenticator.currentUser?.uid;
+      // If user authenticated with mongoDB AND ACCOUNT_STATE.passphrase exists -> save encrypted to Firestore
+      const uid = mongoDBAuthenticator.currentUser?.uid;
       const passphrase = ACCOUNT_STATE.passphrase || null;
 
       if(uid && passphrase) {
         // Save both FINANCIAL_STATE & ACCOUNT_STATE encrypted
-        FirebaseDataManager.saveAllData(uid, passphrase);
+        mongoDBDataManager.saveAllData(uid, passphrase);
         // Also keep local encrypted backup for offline resilience
         try {
           encryptAndSaveAccounts(passphrase); // existing function that writes localStorage (we will patch it below)
@@ -13667,15 +13680,15 @@ img.performance-optimized {
     }
   };
 
-  // --------- 7) Decrypt firebase payload (when available) using user's passphrase ---------
-  async function decryptFirebasePayloadWithPass(passphrase) {
-    const payload = window.__STL__firebasePayload;
+  // --------- 7) Decrypt mongoDB payload (when available) using user's passphrase ---------
+  async function decryptmongoDBPayloadWithPass(passphrase) {
+    const payload = window.__STL__mongoDBPayload;
     if(!payload) return false;
     try {
       const financePlain = aesDecrypt(payload.finance, passphrase);
       const accountsPlain = aesDecrypt(payload.accounts, passphrase);
       if(!financePlain || !accountsPlain) {
-        console.warn('decryptFirebasePayload: decrypt returned null (bad pass?)');
+        console.warn('decryptmongoDBPayload: decrypt returned null (bad pass?)');
         return false;
       }
       // Merge into existing states
@@ -13688,7 +13701,7 @@ img.performance-optimized {
       console.log('☁️ Data cloud didekripsi dan dimuat ke state');
       return true;
     } catch (e) {
-      console.error('decryptFirebasePayloadWithPass err', e);
+      console.error('decryptmongoDBPayloadWithPass err', e);
       return false;
     }
   }
@@ -13701,13 +13714,13 @@ img.performance-optimized {
       if(!passphrase) return;
       // existing local encryption: keep for offline fallback
       try { old_encryptAndSaveAccounts(passphrase); } catch(e) {}
-      // if firebase logged in, upload encrypted accounts into Firestore doc
-      const uid = FirebaseAuthenticator.currentUser?.uid;
+      // if mongoDB logged in, upload encrypted accounts into Firestore doc
+      const uid = mongoDBAuthenticator.currentUser?.uid;
       if(uid && fb_db) {
         // Save structured accounts encrypted
         const accounts = { accounts: ACCOUNT_STATE.accounts, lastUpdated: new Date().toISOString() };
         const enc = aesEncrypt(accounts, passphrase);
-        fb_db.collection('userData').doc(uid).set({ accounts: enc, meta: { lastAccountSave: firebase.firestore.FieldValue.serverTimestamp() } }, { merge: true })
+        fb_db.collection('userData').doc(uid).set({ accounts: enc, meta: { lastAccountSave: mongoDB.firestore.FieldValue.serverTimestamp() } }, { merge: true })
           .then(()=> console.log('☁️ accounts saved to firestore'))
           .catch(e=> console.warn('firestore accounts save err', e));
       }
@@ -13717,9 +13730,9 @@ img.performance-optimized {
   // Replace loadAndDecryptAccounts to prefer firestore payload when user logged in
   const old_loadAndDecryptAccounts = window.loadAndDecryptAccounts;
   window.loadAndDecryptAccounts = function() {
-    const uid = FirebaseAuthenticator.currentUser?.uid;
+    const uid = mongoDBAuthenticator.currentUser?.uid;
     const pass = ACCOUNT_STATE.passphrase;
-    // If firebase user exists, try to fetch doc and decrypt
+    // If mongoDB user exists, try to fetch doc and decrypt
     if(uid && fb_db && pass) {
       fb_db.collection('userData').doc(uid).get().then(doc => {
         if(!doc.exists) {
@@ -13763,7 +13776,7 @@ img.performance-optimized {
     }
   };
 
-  // --------- 9) Backup / Restore integration: upload encrypted .enc to Firebase Storage ---------
+  // --------- 9) Backup / Restore integration: upload encrypted .enc to mongoDB Storage ---------
   // Patch existing backupData / restoreData if present
   const old_backupData = window.backupCloud;
   window.backupCloud = async function() {
@@ -13779,15 +13792,15 @@ img.performance-optimized {
       };
       const enc = aesEncrypt(data, password);
       const blob = new Blob([enc], { type: 'application/octet-stream' });
-      // If firebase available & user logged in -> upload and return url
-      const uid = FirebaseAuthenticator.currentUser?.uid;
+      // If mongoDB available & user logged in -> upload and return url
+      const uid = mongoDBAuthenticator.currentUser?.uid;
       if(uid && fb_storage) {
         const filename = `stl-backup-${new Date().toISOString()}.enc`;
         try {
-          const url = await FirebaseDataManager.uploadBackupBlob(uid, filename, blob);
+          const url = await mongoDBDataManager.uploadBackupBlob(uid, filename, blob);
           // optionally save metadata in Firestore
           if(fb_db) {
-            await fb_db.collection('userData').doc(uid).collection('backups').add({ filename, url, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            await fb_db.collection('userData').doc(uid).collection('backups').add({ filename, url, createdAt: mongoDB.firestore.FieldValue.serverTimestamp() });
           }
           updateDynamicIsland?.('✅ Backup berhasil dan tersimpan di cloud',2000);
           return url;
@@ -13841,10 +13854,10 @@ img.performance-optimized {
     input.click();
   };
 
-  // --------- 10) Wire UI buttons (existing IDs in your HTML) to firebase flows ---------
+  // --------- 10) Wire UI buttons (existing IDs in your HTML) to mongoDB flows ---------
   document.addEventListener('DOMContentLoaded', function() {
     // Init auth listener
-    if(fb_auth) FirebaseAuthenticator.initAuthListener();
+    if(fb_auth) mongoDBAuthenticator.initAuthListener();
 
     // Hijack unlock button -> if user is signed in, attempt decrypt using passphrase; else prompt user to sign-in via Google
     const unlockButton = document.getElementById('unlockRekening');
@@ -13853,8 +13866,8 @@ img.performance-optimized {
         const pass = document.getElementById('rekeningPassphrase')?.value || '';
         if(!pass) { showAccountMessage('Masukkan passphrase terlebih dahulu', 'error'); return; }
 
-        // If firebase user present -> try to load cloud payload and decrypt
-        const uid = FirebaseAuthenticator.currentUser?.uid;
+        // If mongoDB user present -> try to load cloud payload and decrypt
+        const uid = mongoDBAuthenticator.currentUser?.uid;
         if(uid && fb_db) {
           try {
             // fetch doc; decrypt
@@ -13898,7 +13911,7 @@ img.performance-optimized {
           }
         }
 
-        // If not logged-in to firebase or cloud decrypt failed: call original unlockRekening behavior
+        // If not logged-in to mongoDB or cloud decrypt failed: call original unlockRekening behavior
         if(typeof window.unlockRekening === 'function') {
           // note: original implementation reads passphrase and decrypts localStorage
           try { window.unlockRekening(); return; } catch(e){ console.error(e); }
@@ -13908,21 +13921,21 @@ img.performance-optimized {
       });
     }
 
-    // Bind Login/Logout buttons to firebase auth if present
+    // Bind Login/Logout buttons to mongoDB auth if present
     // Replace any existing "Login with Google" mechanism — add a small auth button if needed
     const existingLoginTrigger = document.getElementById('unlockWithGoogle') || null;
     // optional: if user wants a dedicated login button, dev can add <button id="loginGoogle">Login Google</button> in UI
     const loginButton = document.getElementById('loginGoogle');
     if(loginButton) {
-      loginButton.addEventListener('click', () => FirebaseAuthenticator.signInWithGoogle());
+      loginButton.addEventListener('click', () => mongoDBAuthenticator.signInWithGoogle());
     }
     // Bind logout
     const lockButton = document.getElementById('lockRekening');
     if(lockButton) {
       lockButton.addEventListener('click', () => {
-        // prefer firebase signout if logged in
-        if(FirebaseAuthenticator.currentUser) {
-          FirebaseAuthenticator.signOut();
+        // prefer mongoDB signout if logged in
+        if(mongoDBAuthenticator.currentUser) {
+          mongoDBAuthenticator.signOut();
         } else {
           // fallback: existing lockRekening
           if(typeof window.lockRekening === 'function') window.lockRekening();
@@ -13944,7 +13957,7 @@ img.performance-optimized {
     // hide old 'forgotPassphrase' flow if you wish (we keep it but you can disable)
     const forgotBtn = document.getElementById('forgotPassphrase');
     if(forgotBtn) {
-      // Optional: offer firebase passwordless recovery flow instruction
+      // Optional: offer mongoDB passwordless recovery flow instruction
       // For now keep original behavior
       // forgotBtn.style.display = 'none';
     }
@@ -13952,12 +13965,12 @@ img.performance-optimized {
 
   // Expose small APIs for debugging
   window.FB_INJECT = {
-    auth: FirebaseAuthenticator,
-    dataManager: FirebaseDataManager,
-    decryptPayloadWithPass: decryptFirebasePayloadWithPass
+    auth: mongoDBAuthenticator,
+    dataManager: mongoDBDataManager,
+    decryptPayloadWithPass: decryptmongoDBPayloadWithPass
   };
 
-  console.log('✅ Firebase injection script loaded. Replace firebaseConfig and test flows.');
+  console.log('✅ mongoDB injection script loaded. Replace mongoDBConfig and test flows.');
 })();
 </script>
 <!-- ==================== AUTH LOGIN MODAL ==================== -->
@@ -14084,5 +14097,911 @@ document.addEventListener("DOMContentLoaded",()=>{
     document.getElementById("syncToMongoDB")?.addEventListener("click",syncCloud);
 });
 </script>
+<!-- Login/Register Modal -->
+<div id="authModal" class="auth-modal">
+    <div class="auth-modal-content">
+        <div class="auth-header">
+            <h2><i class="fas fa-lock"></i> STL - UDHIS Authentication</h2>
+            <button id="closeAuthModal" class="enhanced-btn btn-error compact-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Login</button>
+            <button class="auth-tab" data-tab="register">Register</button>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" class="enhanced-input compact-input" placeholder="masukkan email Anda">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" class="enhanced-input compact-input" placeholder="masukkan password">
+            </div>
+            <button id="submitLogin" class="enhanced-btn btn-primary compact-btn w-full">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <div class="auth-status" id="loginStatus"></div>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-form">
+            <div class="form-group">
+                <label for="registerEmail">Email:</label>
+                <input type="email" id="registerEmail" class="enhanced-input compact-input" placeholder="masukkan email baru">
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Password:</label>
+                <input type="password" id="registerPassword" class="enhanced-input compact-input" placeholder="buat password minimal 6 karakter">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Konfirmasi Password:</label>
+                <input type="password" id="confirmPassword" class="enhanced-input compact-input" placeholder="ulangi password">
+            </div>
+            <button id="submitRegister" class="enhanced-btn btn-success compact-btn w-full">
+                <i class="fas fa-user-plus"></i> Daftar
+            </button>
+            <div class="auth-status" id="registerStatus"></div>
+        </div>
+        
+        <div class="auth-footer">
+            <p>Login diperlukan untuk backup/restore data ke cloud</p>
+        </div>
+    </div>
+</div>
+<style>
+  /* ==================== AUTH MODAL STYLES ==================== */
+.auth-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--ios-transition);
+}
+
+.auth-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.auth-modal-content {
+    background: var(--theme-card);
+    border-radius: var(--radius-2xl);
+    padding: 0;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--ios-shadow);
+    border: 1px solid var(--theme-border);
+}
+
+.auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--layer1) 0%, var(--layer2) 100%);
+    color: white;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+
+.auth-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--ios-transition);
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.auth-tab.active {
+    background: var(--theme-primary);
+    color: white;
+}
+
+.auth-form {
+    padding: 20px;
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--theme-text);
+}
+
+.auth-status {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    font-size: 14px;
+}
+
+.auth-status.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.auth-status.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.auth-footer {
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid var(--theme-border);
+    font-size: 12px;
+    color: var(--theme-text);
+    opacity: 0.7;
+}
+</style>
+<script>
+  // ==================== AUTHENTICATION SYSTEM ====================
+const AUTH_SYSTEM = {
+    // Konfigurasi backend - sesuaikan dengan URL Python backend Anda
+    BACKEND_URL: 'http://localhost:5000', // Ganti dengan URL backend Python
+    
+    // Inisialisasi sistem auth
+    init() {
+        this.setupAuthEventListeners();
+        this.checkAutoLogin();
+    },
+    
+    // Setup event listeners untuk modal auth
+    setupAuthEventListeners() {
+        // Modal toggle
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#openAuthModal') || e.target.closest('#openLogin')) {
+                this.openAuthModal();
+            }
+        });
+        
+        document.getElementById('closeAuthModal').addEventListener('click', () => {
+            this.closeAuthModal();
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                this.switchAuthTab(tabName);
+            });
+        });
+        
+        // Form submissions
+        document.getElementById('submitLogin').addEventListener('click', () => {
+            this.handleLogin();
+        });
+        
+        document.getElementById('submitRegister').addEventListener('click', () => {
+            this.handleRegister();
+        });
+        
+        // Enter key support
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleLogin();
+        });
+        
+        document.getElementById('confirmPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleRegister();
+        });
+    },
+    
+    // Buka modal auth
+    openAuthModal() {
+        document.getElementById('authModal').classList.add('active');
+        this.switchAuthTab('login');
+    },
+    
+    // Tutup modal auth
+    closeAuthModal() {
+        document.getElementById('authModal').classList.remove('active');
+    },
+    
+    // Ganti tab login/register
+    switchAuthTab(tabName) {
+        // Update tabs
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        
+        // Update forms
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.classList.remove('active');
+        });
+        document.getElementById(`${tabName}Form`).classList.add('active');
+        
+        // Clear status messages
+        this.clearAuthStatus();
+    },
+    
+    // Handle login
+    async handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        
+        if (!email || !password) {
+            this.showAuthStatus('login', 'Harap isi email dan password', 'error');
+            return;
+        }
+        
+        this.showAuthStatus('login', '🔄 Memproses login...', 'info');
+        
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                // Simpan token dan email
+                localStorage.setItem(TOKEN_KEY, result.token);
+                localStorage.setItem(EMAIL_KEY, result.email);
+                
+                this.showAuthStatus('login', '✅ Login berhasil!', 'success');
+                this.closeAuthModal();
+                
+                // Update UI untuk status login
+                this.updateLoginUI(true, result.email);
+                
+                // Sync data dari cloud setelah login
+                setTimeout(() => {
+                    if (typeof MONGODB_STORAGE_MANAGER !== 'undefined') {
+                        MONGODB_STORAGE_MANAGER.syncToMongoDB();
+                    }
+                }, 1000);
+                
+            } else {
+                this.showAuthStatus('login', `❌ ${result.message}`, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            this.showAuthStatus('login', '❌ Gagal terhubung ke server', 'error');
+        }
+    },
+    
+    // Handle register
+    async handleRegister() {
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        if (!email || !password || !confirmPassword) {
+            this.showAuthStatus('register', 'Harap isi semua field', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            this.showAuthStatus('register', 'Password minimal 6 karakter', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            this.showAuthStatus('register', 'Password tidak cocok', 'error');
+            return;
+        }
+        
+        this.showAuthStatus('register', '🔄 Membuat akun baru...', 'info');
+        
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                this.showAuthStatus('register', '✅ Registrasi berhasil! Silakan login.', 'success');
+                
+                // Switch ke tab login setelah registrasi berhasil
+                setTimeout(() => {
+                    this.switchAuthTab('login');
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginPassword').value = '';
+                    document.getElementById('loginPassword').focus();
+                }, 1500);
+                
+            } else {
+                this.showAuthStatus('register', `❌ ${result.message}`, 'error');
+            }
+            
+        } catch (error) {
+            console.error('Register error:', error);
+            this.showAuthStatus('register', '❌ Gagal terhubung ke server', 'error');
+        }
+    },
+    
+    // Tampilkan status auth
+    showAuthStatus(formType, message, type) {
+        const statusElement = document.getElementById(`${formType}Status`);
+        statusElement.textContent = message;
+        statusElement.className = `auth-status ${type}`;
+    },
+    
+    // Clear status messages
+    clearAuthStatus() {
+        document.getElementById('loginStatus').textContent = '';
+        document.getElementById('loginStatus').className = 'auth-status';
+        document.getElementById('registerStatus').textContent = '';
+        document.getElementById('registerStatus').className = 'auth-status';
+    },
+    
+    // Update UI berdasarkan status login
+    updateLoginUI(isLoggedIn, email = null) {
+        if (isLoggedIn) {
+            // Update dynamic island
+            if (typeof updateDynamicIsland === 'function') {
+                updateDynamicIsland(`👋 Selamat datang, ${email}`, 3000);
+            }
+            
+            // Enable backup/restore buttons
+            const backupBtn = document.getElementById('backupData');
+            const restoreBtn = document.getElementById('restoreData');
+            const syncBtn = document.getElementById('syncData');
+            
+            if (backupBtn) backupBtn.disabled = false;
+            if (restoreBtn) restoreBtn.disabled = false;
+            if (syncBtn) syncBtn.disabled = false;
+            
+        } else {
+            // Disable backup/restore buttons
+            const backupBtn = document.getElementById('backupData');
+            const restoreBtn = document.getElementById('restoreData');
+            const syncBtn = document.getElementById('syncData');
+            
+            if (backupBtn) backupBtn.disabled = true;
+            if (restoreBtn) restoreBtn.disabled = true;
+            if (syncBtn) syncBtn.disabled = true;
+        }
+    },
+    
+    // Cek auto login dari localStorage
+    checkAutoLogin() {
+        const token = localStorage.getItem(TOKEN_KEY);
+        const email = localStorage.getItem(EMAIL_KEY);
+        
+        if (token && email) {
+            this.updateLoginUI(true, email);
+            console.log('Auto-login detected for:', email);
+        } else {
+            this.updateLoginUI(false);
+        }
+    },
+    
+    // Logout function
+    logout() {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(EMAIL_KEY);
+        this.updateLoginUI(false);
+        
+        if (typeof updateDynamicIsland === 'function') {
+            updateDynamicIsland('👋 Berhasil logout', 2000);
+        }
+    },
+    
+    // Get auth headers untuk API calls
+    getAuthHeaders() {
+        const token = localStorage.getItem(TOKEN_KEY);
+        return {
+            'Content-Type': 'application/json',
+            'x-access-token': token || ''
+        };
+    },
+    
+    // Upload data ke backend Python
+    async uploadToBackend(data) {
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) {
+            throw new Error('User not logged in');
+        }
+        
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/api/sync/upload`, {
+                method: 'POST',
+                headers: this.getAuthHeaders(),
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message);
+            }
+            
+            return result;
+            
+        } catch (error) {
+            console.error('Upload to backend failed:', error);
+            throw error;
+        }
+    },
+    
+    // Download data dari backend Python
+    async downloadFromBackend() {
+        const token = localStorage.getItem(TOKEN_KEY);
+        if (!token) {
+            throw new Error('User not logged in');
+        }
+        
+        try {
+            const response = await fetch(`${this.BACKEND_URL}/api/sync/download`, {
+                method: 'GET',
+                headers: this.getAuthHeaders()
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message);
+            }
+            
+            return result.data || {};
+            
+        } catch (error) {
+            console.error('Download from backend failed:', error);
+            throw error;
+        }
+    }
+};
+
+// ==================== CLIENT-SIDE ENCRYPTION ====================
+const CLIENT_ENCRYPTION = {
+    // Encrypt data sebelum dikirim ke backend
+    encryptData(data, password = null) {
+        try {
+            const dataStr = JSON.stringify(data);
+            
+            // Gunakan password dari input atau token sebagai key
+            const encryptionKey = password || localStorage.getItem(TOKEN_KEY) || 'default-key';
+            
+            // Simple encryption menggunakan CryptoJS (sudah diinclude di project)
+            const encrypted = CryptoJS.AES.encrypt(dataStr, encryptionKey).toString();
+            return encrypted;
+            
+        } catch (error) {
+            console.warn('Encryption failed, returning plain data:', error);
+            return data;
+        }
+    },
+    
+    // Decrypt data setelah diterima dari backend
+    decryptData(encryptedData, password = null) {
+        try {
+            // Jika data tidak terenkripsi, return as-is
+            if (typeof encryptedData === 'object') {
+                return encryptedData;
+            }
+            
+            const encryptionKey = password || localStorage.getItem(TOKEN_KEY) || 'default-key';
+            
+            const decrypted = CryptoJS.AES.decrypt(encryptedData, encryptionKey);
+            const decryptedStr = decrypted.toString(CryptoJS.enc.Utf8);
+            
+            return JSON.parse(decryptedStr);
+            
+        } catch (error) {
+            console.warn('Decryption failed, returning original data:', error);
+            return encryptedData;
+        }
+    }
+};
+
+// ==================== MODIFIED REQUIRE LOGIN FUNCTION ====================
+function requireLogin() {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+        AUTH_SYSTEM.openAuthModal();
+        return false;
+    }
+    
+    // Optional: Validasi token expiry (basic check)
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const expiry = payload.exp * 1000; // Convert to milliseconds
+        if (Date.now() > expiry) {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(EMAIL_KEY);
+            AUTH_SYSTEM.openAuthModal();
+            return false;
+        }
+    } catch (error) {
+        console.warn('Token validation error:', error);
+    }
+    
+    return true;
+}
+
+// ==================== INTEGRASI DENGAN EXISTING SYSTEMS ====================
+
+// Override backupData function untuk include authentication
+const originalBackupData = window.backupData;
+window.backupData = function() {
+    if (!requireLogin()) {
+        updateDynamicIsland('⚠️ Harap login terlebih dahulu', 2000);
+        return;
+    }
+    
+    const password = document.getElementById('backupPassword').value;
+    if (password !== 'b4ckupmyd4t4') {
+        updateDynamicIsland('❌ Password backup salah', 2000);
+        return;
+    }
+    
+    // Panggil fungsi backup original
+    if (originalBackupData) {
+        originalBackupData();
+    }
+    
+    // Juga backup ke Python backend
+    AUTH_SYSTEM.uploadToBackend(window.FINANCIAL_STATE)
+        .then(() => {
+            updateDynamicIsland('✅ Backup berhasil ke cloud', 2000);
+        })
+        .catch(error => {
+            console.error('Backup to cloud failed:', error);
+            updateDynamicIsland('⚠️ Backup lokal berhasil, cloud gagal', 2000);
+        });
+};
+
+// Override restoreData function
+const originalRestoreData = window.restoreData;
+window.restoreData = function() {
+    if (!requireLogin()) {
+        updateDynamicIsland('⚠️ Harap login terlebih dahulu', 2000);
+        return;
+    }
+    
+    const password = document.getElementById('backupPassword').value;
+    if (password !== 'b4ckupmyd4t4') {
+        updateDynamicIsland('❌ Password restore salah', 2000);
+        return;
+    }
+    
+    // Coba restore dari cloud terlebih dahulu
+    AUTH_SYSTEM.downloadFromBackend()
+        .then(cloudData => {
+            if (cloudData && Object.keys(cloudData).length > 0) {
+                // Gunakan data dari cloud
+                Object.assign(window.FINANCIAL_STATE, cloudData);
+                updateDynamicIsland('✅ Data restored dari cloud', 2000);
+            } else {
+                // Fallback ke restore lokal
+                if (originalRestoreData) {
+                    originalRestoreData();
+                }
+                updateDynamicIsland('ℹ️ Menggunakan data lokal', 2000);
+            }
+            
+            // Refresh UI
+            if (window.renderTransactions) renderTransactions();
+            if (window.updateDashboard) updateDashboard();
+        })
+        .catch(error => {
+            console.error('Restore from cloud failed:', error);
+            // Fallback ke restore lokal
+            if (originalRestoreData) {
+                originalRestoreData();
+            }
+            updateDynamicIsland('⚠️ Restore cloud gagal, menggunakan lokal', 2000);
+        });
+};
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Inisialisasi auth system
+    AUTH_SYSTEM.init();
+    
+    // Auto-buka modal auth jika belum login saat mencoba backup/sync
+    const backupBtn = document.getElementById('backupData');
+    const restoreBtn = document.getElementById('restoreData');
+    const syncBtn = document.getElementById('syncData');
+    
+    if (backupBtn) {
+        backupBtn.addEventListener('click', function(e) {
+            if (!requireLogin()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    }
+    
+    if (restoreBtn) {
+        restoreBtn.addEventListener('click', function(e) {
+            if (!requireLogin()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    }
+    
+    if (syncBtn) {
+        syncBtn.addEventListener('click', function(e) {
+            if (!requireLogin()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    }
+    
+    // Tambahkan tombol login di header
+    const header = document.querySelector('.main-content .flex.justify-between.items-center');
+    if (header) {
+        const loginButton = document.createElement('button');
+        loginButton.id = 'openAuthModal';
+        loginButton.className = 'enhanced-btn compact-btn';
+        loginButton.innerHTML = '<i class="fas fa-user"></i> Login';
+        loginButton.style.marginLeft = '10px';
+        
+        header.appendChild(loginButton);
+    }
+});
+
+// Export untuk global access
+window.AUTH_SYSTEM = AUTH_SYSTEM;
+window.CLIENT_ENCRYPTION = CLIENT_ENCRYPTION;
+window.requireLogin = requireLogin;
+</script>
+<script>
+  // ==================== FUNGSI AUTENTIKASI CLOUD BARU ====================
+
+/**
+ * Mengirim kredensial ke Backend Python untuk Login dan menyimpan token.
+ * @param {string} email
+ * @param {string} password
+ */
+async function loginCloud(email, password) {
+    if (!email || !password) {
+        return updateDynamicIsland?.("Email dan Password harus diisi.", 3000);
+    }
+    try {
+        updateDynamicIsland?.("☁ Memproses Login...", 2000);
+        
+        const r = await fetch(`${PY_BACKEND}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const j = await r.json();
+
+        if (!r.ok) throw new Error(j.message || 'Login gagal.');
+
+        // 🔐 KEBERHASILAN: Simpan Token dan Email
+        localStorage.setItem(TOKEN_KEY, j.token);
+        localStorage.setItem(EMAIL_KEY, j.email);
+
+        updateDynamicIsland?.(`✅ Login Sukses: ${j.email}`, 3000);
+        // Panggil fungsi untuk me-refresh UI dan memuat data (opsional: langsung restore)
+        restoreCloud(); 
+
+    } catch (e) {
+        updateDynamicIsland?.(`❌ Login Gagal: ${e.message}`, 3000);
+    }
+}
+
+/**
+ * Mengirim kredensial untuk registrasi akun baru.
+ * @param {string} email
+ * @param {string} password
+ */
+async function registerCloud(email, password) {
+    if (!email || !password) {
+        return updateDynamicIsland?.("Email dan Password harus diisi.", 3000);
+    }
+    try {
+        updateDynamicIsland?.("☁ Memproses Registrasi...", 2000);
+
+        const r = await fetch(`${PY_BACKEND}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const j = await r.json();
+
+        if (!r.ok) throw new Error(j.message || 'Registrasi gagal.');
+
+        updateDynamicIsland?.("✅ Registrasi Sukses! Silakan Login.", 4000);
+    } catch (e) {
+        updateDynamicIsland?.(`❌ Registrasi Gagal: ${e.message}`, 3000);
+    }
+}
+
+function signOutCloud() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(EMAIL_KEY);
+    // Panggil fungsi kunci UI (jika ada)
+    if(typeof window.lockRekening === 'function') window.lockRekening(); 
+    updateDynamicIsland?.("☁ Anda telah logout", 2000);
+}
+
+// ==================== KONEKSI KE UI ====================
+// Anda harus mengganti kaitan ke tombol-tombol Login/Signout lama Anda:
+
+document.addEventListener("DOMContentLoaded",() => {
+    // ... (Listener Sync/Backup/Restore yang sudah Anda buat) ...
+
+    // GANTI SEMUA LISTENER FIREBASE LAMA DENGAN INI!
+    const loginBtn = document.getElementById('loginButtonIDAnda'); 
+    if(loginBtn) loginBtn.addEventListener('click', () => {
+        const email = document.getElementById('loginEmailInputID').value; 
+        const password = document.getElementById('loginPasswordInputID').value;
+        loginCloud(email, password);
+    });
+
+    const registerBtn = document.getElementById('registerButtonIDAnda'); 
+    if(registerBtn) registerBtn.addEventListener('click', () => {
+        const email = document.getElementById('registerEmailInputID').value; 
+        const password = document.getElementById('registerPasswordInputID').value;
+        registerCloud(email, password);
+    });
+
+    const signoutBtn = document.getElementById('signOutButtonIDAnda');
+    if(signoutBtn) signoutBtn.addEventListener('click', signOutCloud);
+});
+</script>
+
+<!-- STL NON-INTRUSIVE BACKEND INTEGRATION -->
+<script>
+(function(){
+  'use strict';
+  // Non-intrusive helper: expose safe functions without modifying UI or text.
+  if (!window.STL_backend) {
+    const apiRequest = async (endpoint, method='GET', data=null, tokenRequired=true) => {
+      const headers = {'Content-Type':'application/json'};
+      if (tokenRequired) {
+        const token = localStorage.getItem('user_jwt_token');
+        if (!token) throw new Error('Belum login / token hilang');
+        headers['x-access-token'] = token;
+      }
+      const res = await fetch((typeof PY_BACKEND !== 'undefined' ? PY_BACKEND : '') + endpoint, {
+        method,
+        headers,
+        body: data ? JSON.stringify(data) : null
+      });
+      let json = {};
+      try { json = await res.json(); } catch(e){}
+      if (!res.ok) throw new Error(json.message || ('Network error: '+res.status));
+      return json;
+    };
+
+    const syncUpload = async () => {
+      const appData = localStorage.getItem('financialData');
+      if (!appData) throw new Error('Belum ada data lokal untuk diupload');
+      let parsed = null;
+      try { parsed = JSON.parse(appData); } catch(e){ parsed = appData; }
+      return await apiRequest('/api/sync/upload','POST', parsed);
+    };
+
+    const syncDownload = async () => {
+      return await apiRequest('/api/sync/download','GET');
+    };
+
+    // expose but do not auto-run or alter DOM
+    window.STL_backend = { apiRequest, syncUpload, syncDownload };
+  }
+})();
+</script>
+<!-- END STL NON-INTRUSIVE BACKEND INTEGRATION -->
+
+<!-- START: LOCAL TRUST OVERRIDE - keeps UI running on trusted devices without intrusive login notices -->
+<script>
+(function(){
+  try{
+    // Remove known intrusive text occurrences (best-effort)
+    try {
+      document.addEventListener('DOMContentLoaded', function(){
+        var nodes = document.querySelectorAll('body *');
+        nodes.forEach(function(n){
+          if(n.childNodes && n.childNodes.length===1 && n.childNodes[0].nodeType===3){
+            var txt = n.textContent || '';
+            if(/Silakan login untuk menyimpan data ke cloud/i.test(txt) || /
+              n.textContent = '';
+            }
+          }
+        });
+      });
+    }catch(e){}
+
+    // Trusted hostnames: allow UI to run without forcing login prompt
+    var trustedHosts = ['localhost','127.0.0.1','::1'];
+    // Also treat file:// as trusted
+    var isTrusted = (location.protocol === 'file:') || (trustedHosts.indexOf(location.hostname) !== -1);
+
+    // If you want to add more trusted hosts, set window.STL_TRUSTED_HOSTS = [...];
+    if(Array.isArray(window.STL_TRUSTED_HOSTS)){
+      try { window.STL_TRUSTED_HOSTS.forEach(function(h){ if(trustedHosts.indexOf(h)===-1) trustedHosts.push(h); }); } catch(e){}
+      isTrusted = isTrusted || (window.STL_TRUSTED_HOSTS.indexOf(location.hostname)!==-1);
+    }
+
+    // Local access key stored so modal doesn't reappear on trusted devices
+    var ACCESS_KEY = 'stl_protect_access_v1';
+
+    // If trusted, ensure localStorage has access to bypass modal and allow requireLogin to return true
+    if(isTrusted){
+      try {
+        var access = localStorage.getItem(ACCESS_KEY);
+        if(!access){
+          // set a basic access token tied to hostname/time (non-secret)
+          localStorage.setItem(ACCESS_KEY, JSON.stringify({host: location.hostname, ts: Date.now()}));
+        }
+      } catch(e){}
+    }
+
+    // Override global requireLogin if exists, else create safe version
+    try{
+      var originalRequire = window.requireLogin;
+    }catch(e){ originalRequire = null; }
+    window.requireLogin = function(){
+      try{
+        // if trusted host or local access flag exists -> allow UI
+        var a = null;
+        try { a = JSON.parse(localStorage.getItem(ACCESS_KEY) || 'null'); } catch(e){ a = null; }
+        if(isTrusted || (a && a.host && a.ts)){
+          return true;
+        }
+        // else, fallback to original if present
+        if(typeof originalRequire === 'function'){
+          return originalRequire();
+        }
+        return false;
+      } catch(e){
+        return false;
+      }
+    };
+  } catch(err){
+    console.warn('Local trust override error', err);
+  }
+})();
+</script>
+<!-- END: LOCAL TRUST OVERRIDE -->
 </body>
 </html>
