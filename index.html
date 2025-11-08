@@ -4395,14 +4395,14 @@ const MONGODB_STORAGE_MANAGER = {
     // Setup Integrasi dengan Sidebar yang sudah ada
     setupSidebarIntegration() {
         // Integrasi dengan tombol backup di sidebar kiri
-        const originalBackup = window.backupData;
-        window.backupData = () => {
+        const originalBackup = window.backupCloud;
+        window.backupCloud = () => {
             this.backupToMongoDB();
         };
 
         // Integrasi dengan tombol restore di sidebar kiri
         const originalRestore = window.restoreData;
-        window.restoreData = () => {
+        window.restoreCloud = () => {
             this.restoreFromMongoDB();
         };
 
@@ -4510,7 +4510,7 @@ const MONGODB_STORAGE_MANAGER = {
                 break;
             case 'sidebarBackup':
                 // Trigger backup dari sidebar
-                if (window.backupData) window.backupData();
+                if (window.backupCloud) window.backupCloud();
                 break;
             case 'importantHistory':
                 this.showImportantHistory();
@@ -5381,7 +5381,7 @@ async function syncDataToPythonBackend() {
 
 // Ganti tombol-tombol ini untuk memanggil fungsi koneksi Python yang baru
 const backupBtn = document.getElementById('backupData');
-if(backupBtn) backupBtn.addEventListener('click', syncDataToPythonBackend); // Mengganti window.backupData
+if(backupBtn) backupBtn.addEventListener('click', syncDataToPythonBackend);
 
 const restoreBtn = document.getElementById('restoreData');
 if(restoreBtn) restoreBtn.addEventListener('click', restoreDataFromPythonBackend); // Fungsi restore juga harus dibuat
@@ -13765,8 +13765,8 @@ img.performance-optimized {
 
   // --------- 9) Backup / Restore integration: upload encrypted .enc to Firebase Storage ---------
   // Patch existing backupData / restoreData if present
-  const old_backupData = window.backupData;
-  window.backupData = async function() {
+  const old_backupData = window.backupCloud;
+  window.backupCloud = async function() {
     try {
       const password = document.getElementById('backupPassword')?.value || '';
       if(!password) { updateDynamicIsland?.('Masukkan password backup',2000); return; }
@@ -13805,7 +13805,7 @@ img.performance-optimized {
   };
 
   // Restore: allow user to pick .enc file then attempt decrypt with provided password; optionally upload to firestore
-  window.restoreData = function() {
+  window.restoreCloud = function() {
     const password = document.getElementById('backupPassword')?.value || '';
     const input = document.createElement('input');
     input.type = 'file';
@@ -13932,7 +13932,7 @@ img.performance-optimized {
 
     // Wire other buttons: backup/restore/sync
     const backupBtn = document.getElementById('backupData');
-    if(backupBtn) backupBtn.addEventListener('click', window.backupData);
+    if(backupBtn) backupBtn.addEventListener('click', window.backupCloud);
     const restoreBtn = document.getElementById('restoreData');
     if(restoreBtn) restoreBtn.addEventListener('click', window.restoreData);
     const syncBtn = document.getElementById('syncData');
