@@ -1,43 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+  // Disable browser popup 'This page says'
+  window.alert = () => false;
+  window.confirm = () => true;
+  window.prompt = () => null;
+  console.log("✅ All browser alert/confirm/prompt popups disabled.");
+</script>
   
 <script>
 (function(){
   'use strict';
-
-<script>
-// ======= OVERRIDE requireLogin -> ALWAYS ALLOW in local/trusted contexts =======
-(function(){
-  const _STL_ACCESS_KEY = 'stl_protect_access_v1';
-  const _trustedHosts = ['localhost','127.0.0.1','::1'];
-  const _isTrusted = (location.protocol === 'file:') || (_trustedHosts.indexOf(location.hostname) !== -1);
-  try {
-    window.requireLogin = function(){
-      try { 
-        if (_isTrusted) return true;
-        const a = JSON.parse(localStorage.getItem(_STL_ACCESS_KEY) || 'null');
-        if (a && a.host) return true;
-        return true; // default allow
-      } catch(e){ return true; }
-    };
-  } catch(e){}
-  document.addEventListener('DOMContentLoaded', function(){
-    try {
-      document.querySelectorAll('body *').forEach(function(n){
-        if (!n || !n.childNodes) return;
-        if (n.childNodes.length === 1 && n.childNodes[0].nodeType === 3) {
-          const txt = (n.textContent || '').trim();
-          if (/Silakan login/i.test(txt) || /Harap login/i.test(txt)) {
-            n.textContent = '';
-          }
-        }
-      });
-    } catch(e){}
-  }, {once:true});
-})();
-</script>
-
   // 👇 TEMPATKAN KODE DI SINI (SETELAH 'use strict';)
   // ==================== KONSTANTA KRITIS BACKEND ====================
   const PY_BACKEND = 'http://localhost:5000'; // GANTI URL Anda
