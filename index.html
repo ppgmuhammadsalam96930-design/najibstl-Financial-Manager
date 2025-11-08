@@ -5288,6 +5288,107 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ==================== AKHIR DARI INJEKSI FIREBASE ====================
 </script>
+<script>
+// Anda harus mendapatkan token ini saat login berhasil!
+const userToken = localStorage.getItem('user_jwt_token'); 
+
+async function syncDataToPythonBackend() {
+    const backupData = prepareBackupData(); // Fungsi Anda untuk mengumpulkan data
+    const backendUrl = 'http://localhost:5000'; // Ganti dengan URL domain Anda saat deployment
+
+    try {
+        const response = await fetch(`${backendUrl}/api/sync/upload`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Kunci keamanan: kirim token yang didapat saat login
+                'x-access-token': userToken 
+            },
+            body: JSON.stringify(backupData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            console.log('Sync Berhasil:', result.message);
+            // Tampilkan notifikasi berhasil
+        } else {
+            console.error('Sync Gagal:', result.message);
+            // Tampilkan notifikasi gagal, minta login ulang jika token expired
+        }
+    } catch (error) {
+        console.error('Koneksi Error:', error);
+    }
+}
+</script>
+<script>
+async function loginToBackend(email, password) {
+    const BACKEND_URL = 'mongodb+srv://najibwahidussalam938_db_user:your_password@cluster0.aadsm5v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'; // Ganti dengan URL server Python Anda
+
+    const response = await fetch(`${BACKEND_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+        // 🚨 Simpan Token JWT yang diterima
+        localStorage.setItem('user_jwt_token', result.token); 
+        console.log('Login Python Berhasil!');
+        // Lanjutkan ke alur aplikasi utama
+    } else {
+        console.error('Login Gagal:', result.message);
+    }
+}
+</script>
+<script>
+async function syncDataToPythonBackend() {
+    const BACKEND_URL = 'https://api.domain-anda.com';
+    const userToken = localStorage.getItem('user_jwt_token'); 
+
+    if (!userToken) {
+        console.error('Harap login terlebih dahulu.');
+        return;
+    }
+
+    // Ganti dengan fungsi yang mengumpulkan semua data dari localStorage
+    const backupData = prepareAllLocalStorageData(); 
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/sync/upload`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 🔐 WAJIB: Kirim token ke backend
+                'x-access-token': userToken 
+            },
+            body: JSON.stringify(backupData)
+        });
+
+        // Tangani hasil...
+        // ...
+        
+    } catch (error) {
+        console.error('Koneksi Error:', error);
+    }
+}
+</script>
+<script>
+  // Cuplikan dari bagian akhir stl-small bank.txt:
+// ...
+
+// Ganti tombol-tombol ini untuk memanggil fungsi koneksi Python yang baru
+const backupBtn = document.getElementById('backupData');
+if(backupBtn) backupBtn.addEventListener('click', syncDataToPythonBackend); // Mengganti window.backupData
+
+const restoreBtn = document.getElementById('restoreData');
+if(restoreBtn) restoreBtn.addEventListener('click', restoreDataFromPythonBackend); // Fungsi restore juga harus dibuat
+
+const syncBtn = document.getElementById('syncData');
+if(syncBtn) syncBtn.addEventListener('click', syncDataToPythonBackend);
+</script>
 <!-- Tambahkan tombol game dinosaurus di atas tombol currency -->
 <button id="openDinoGame" class="dino-game-toggle">
     <i class="fas fa-dragon"></i>
@@ -13858,6 +13959,130 @@ img.performance-optimized {
 
   console.log('✅ Firebase injection script loaded. Replace firebaseConfig and test flows.');
 })();
+</script>
+<!-- ==================== AUTH LOGIN MODAL ==================== -->
+<div id="authModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999999;place-items:center;">
+  <div style="width:90%;max-width:360px;background:#fff;padding:18px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.2)">
+    <h3 style="margin-bottom:10px">Login Cloud Protection</h3>
+    <input id="authEmail" type="email" placeholder="Email" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:8px">
+    <input id="authPassword" type="password" placeholder="Password" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:8px">
+    <p id="authMsg" style="color:red;font-size:13px;margin-bottom:8px"></p>
+    <div style="display:flex;justify-content:space-between">
+      <button onclick="hideLogin()" style="padding:8px 14px;border:none;border-radius:6px;background:#999;color:#fff">Batal</button>
+      <button onclick="doLogin()" style="padding:8px 14px;border:none;border-radius:6px;background:#10b981;color:#fff">Login</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== CONFIG ==================== */
+const PY_BACKEND = "http://localhost:5000"; // ganti saat deploy
+const TOKEN_KEY = "user_jwt_token";
+
+/* ==================== LOGIN SYSTEM ==================== */
+function showLogin(){ document.getElementById("authModal").style.display="grid" }
+function hideLogin(){ document.getElementById("authModal").style.display="none" }
+
+async function doLogin(){
+    const email = authEmail.value.trim();
+    const pass  = authPassword.value.trim();
+    authMsg.textContent = "";
+    if(!email || !pass) return authMsg.textContent = "Isi email dan password";
+
+    try {
+        const r = await fetch(`${PY_BACKEND}/auth/login`, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({email,password:pass})
+        });
+        const j = await r.json();
+        if(!r.ok) return authMsg.textContent = j.message || "Login gagal";
+
+        localStorage.setItem(TOKEN_KEY, j.token);
+        hideLogin();
+        updateDynamicIsland?.("✅ Login Berhasil",2000);
+    } catch(e){
+        authMsg.textContent = "Server tidak terjangkau";
+    }
+}
+
+/* ==================== GATE BACKUP / RESTORE / SYNC ==================== */
+function requireLogin(){
+    if(!localStorage.getItem(TOKEN_KEY)){
+        showLogin();
+        return false;
+    }
+    return true;
+}
+
+/* ==================== KIRIM DATA KE BACKEND PYTHON ==================== */
+async function sendToBackend(endpoint, body){
+    const token = localStorage.getItem(TOKEN_KEY);
+    try {
+        const r = await fetch(`${PY_BACKEND}${endpoint}`,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "x-access-token": token
+            },
+            body: JSON.stringify(body)
+        });
+        return r.json();
+    } catch(e){
+        return {error:true,message:"Koneksi gagal"};
+    }
+}
+
+function collectAppData(){
+    return {
+        FINANCIAL_STATE: window.FINANCIAL_STATE || {},
+        ACCOUNT_STATE: window.ACCOUNT_STATE || {},
+        TIME: new Date().toISOString()
+    }
+}
+
+/* ==================== AKSI TOMBOL UTAMA ==================== */
+async function backupCloud(){
+    if(!requireLogin()) return;
+    updateDynamicIsland?.("☁ Backup ke server...",2000);
+    const res = await sendToBackend("/api/sync/upload", collectAppData());
+    if(res.error) return updateDynamicIsland?.("❌ Backup gagal",2000);
+    updateDynamicIsland?.("✅ Backup sukses ke cloud",2000);
+}
+
+async function restoreCloud(){
+    if(!requireLogin()) return;
+    updateDynamicIsland?.("☁ Memuat data...",2000);
+    try {
+        const r = await fetch(`${PY_BACKEND}/api/sync/download`,{
+            headers:{ "x-access-token": localStorage.getItem(TOKEN_KEY) }
+        });
+        const j = await r.json();
+        if(!r.ok) throw j;
+        Object.assign(window.FINANCIAL_STATE, j.data.FINANCIAL_STATE);
+        Object.assign(window.ACCOUNT_STATE, j.data.ACCOUNT_STATE);
+        updateDynamicIsland?.("✅ Data dipulihkan",2000);
+    } catch(e){
+        updateDynamicIsland?.("❌ Restore gagal",2000);
+    }
+}
+
+async function syncCloud(){
+    if(!requireLogin()) return;
+    await backupCloud();
+}
+
+/* ==================== TEBAS FUNGSI LAMA, GANTI KE BACKEND ==================== */
+window.backupData  = backupCloud;
+window.restoreData = restoreCloud;
+window.syncData    = syncCloud;
+
+/* ==================== PASANG LISTENER KE TOMBOL UI KAMU ==================== */
+document.addEventListener("DOMContentLoaded",()=>{
+    document.getElementById("backupToMongoDB")?.addEventListener("click",backupCloud);
+    document.getElementById("restoreFromMongoDB")?.addEventListener("click",restoreCloud);
+    document.getElementById("syncToMongoDB")?.addEventListener("click",syncCloud);
+});
 </script>
 </body>
 </html>
